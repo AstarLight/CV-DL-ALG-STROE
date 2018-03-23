@@ -9,7 +9,7 @@ CV算法工程师知识体系
 - Algorithm
 - Deep Learning
 - Image Processing
-- Pattern Recognization
+- Pattern Recognition
 - Machine Learing
 
 
