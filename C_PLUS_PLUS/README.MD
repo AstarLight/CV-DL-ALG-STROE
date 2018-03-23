@@ -66,6 +66,7 @@ int main() {
 ```
 
 2.只能在栈上实例化
+
 只有使用new运算符，对象才会建立在堆上，因此，只要禁用new运算符就可以实现类对象只能建立在栈上。将operator new()设为私有即可。代码如下：
 ```
 #include <iostream>
@@ -98,7 +99,8 @@ int main() {
 2. const_cast
 用于取出const属性，把const类型的指针变为非const类型的指针，如：const int *fun(int x,int y){}　　int *ptr=const_cast<int *>(fun(2.3))
 3. dynamic_cast
-    dynamic_cast <type-id> (expression),运算符把expression转换成type-id类型的对象。Type-id 必须是类的指针、类的引用或者void*；
+    
+  dynamic_cast <type-id> (expression),运算符把expression转换成type-id类型的对象。Type-id 必须是类的指针、类的引用或者void*；
 - 其他三种都是编译时完成的，dynamic_cast是运行时处理的，运行时要进行类型检查
 - 不能用于内置的基本数据类型的强制转换
 - dynamic_cast转换如果成功的话返回的是指向类的指针或引用，指针转换失败的话则会返回NULL，引用转换失败抛出异常。
@@ -123,9 +125,60 @@ int main()
 
 
 ```
-述定义中可以看到,B1和B2是不相关的类,从L1可以看到,dynamic_cast允许这种转换:只要B1存在多态方法.
+从上述定义中可以看到,B1和B2是不相关的类,从L1可以看到,dynamic_cast允许这种转换:只要B1存在多态方法.
 L2将编译失败,static_cast并不允许两个完全不相干的类互相转换.
 
 4.reinterpret_cast
+
 interpret是解释的意思，reinterpret即为重新解释，此标识符的意思即为数据的二进制形式重新解释，但是不改变其值。如：int i; char *ptr="hello freind!"; i=reinterpret_cast<int>(ptr);这个转换方式很少使用。
 
+### STL中的容器：增减元素对迭代器的影响？
+这个问题主要是针对连续内存容器和非连续内存容器。
+
+对于连续内存容器，如vector、deque等，增减元素均会使得当前之后的所有迭代器失效。因此，以删除元素为例：由于erase()总是指向被删除元素的下一个元素的有效迭代器，因此，可以利用该连续内存容器的成员erase()函数的返回值。常见的编程写法为：
+```
+for(auto iter = myvec.begin(); iter != myvec.end())
+{
+    if(delete iter)
+        iter = myvec.erase(iter);
+    else
+        iter++;
+}
+
+```
+对于非连续内存容器，如set、map等。增减元素只会使得当前迭代器无效。仍以删除元素为例，由于删除元素后，erase()返回的迭代器将是无效的迭代器。因此，需要在调用erase()之前，就使得迭代器指向删除元素的下一个元素。常见的编程写法为：
+```
+for(autoiter = myset.begin(); iter != myset.end())
+{
+    if(delete iter)
+        iter = myset.erase(iter++);
+    else
+        iter++;
+}
+
+```
+### mutable和volatile
+1. mutable 
+
+ 在C++中，mutable是为了突破const的限制而设置的。被mutable修饰的变量，将永远处于可变的状态，即使在一个const函数中，甚至结构体变量或者类对象为const，其mutable成员也可以被修改。
+ ```
+#include <iostream>
+#include <stdio.h>
+
+struct A
+{
+    int a;
+    mutable int b;
+};
+
+int main() {
+    const A instance = {1,2};
+    instance.a = 11;  //编译错误
+    instance.b = 12;
+
+    return 0;
+}
+ ```
+ 2. volatile
+ 
+编译器进行优化时，它有时会取一些值的时候，直接从寄存器里进行存取，而不是从内存中获取，这种优化在单线程的程序中没有问题，但到了多线程程序中，由于多个线程是并发运行的，就有可能一个线程把某个公共的变量已经改变了，这时其余线程中寄存器的值已经过时，但这个线程本身还不知道，以为没有改变，仍从寄存器里获取，就导致程序运行会出现未定义的行为。并不是因为用volatile修饰了的变量就是“易变”了，假如没有外因，即使用volatile定义，它也不会变化。而加了volatile修饰的变量，编译器将不对其相关代码执行优化，而是生成对应代码直接存取原始内存地址。
