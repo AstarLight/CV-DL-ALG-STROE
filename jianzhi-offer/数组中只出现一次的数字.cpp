@@ -5,14 +5,14 @@
 /*
 思路一：哈希表思想，空间复杂度O(n)，时间复杂度O(n)
 思路二：位操作异或，首先异或所有数求出sum，然后检查sum二进制中哪个最低位是1的，我们找他出来。再根据这个位是否为1
-继续划分成两个数组，继续使用异或求出各自数组中只出现一次的数。空间复杂度O（n），时间复杂度O（n）
+继续划分成两个数组，继续使用异或求出各自数组中只出现一次的数。空间复杂度O（1），时间复杂度O（n）
 */
-
-
+#if 0
 class Solution {
 public:
     void FindNumsAppearOnce(vector<int> data,int* num1,int *num2) {
         map<int,int> m_map;
+
         for(int i=0;i<data.size();i++)
         {
             m_map[data[i]] += 1;
@@ -33,8 +33,9 @@ public:
         }
     }
 };
+#endif
 
-#if 0   
+#if 1 
 class Solution {
 public:
     void FindNumsAppearOnce(vector<int> data,int* num1,int *num2) {
@@ -49,28 +50,13 @@ public:
             if((sum & flag) != 0) break;
             flag = flag << 1;
         }
-        vector<int> vec1;
-        vector<int> vec2;
+        *num1 = *num2 = 0;
         for(int i=0;i<data.size();i++)
         {
             if((data[i] & flag) == 0)
-            {
-                vec1.push_back(data[i]);
-            }
+                *num1 ^= data[i];
             else
-            {
-                vec2.push_back(data[i]);
-            }
-        }
-        *num1 = vec1[0];
-        for(int i=1;i<vec1.size();i++)
-        {
-            *num1 = *num1 ^ vec1[i];
-        }
-        *num2 = vec2[0];
-        for(int i=1;i<vec2.size();i++)
-        {
-            *num2 = *num2 ^ vec2[i];
+                *num2 ^= data[i];
         }
     }
 };
