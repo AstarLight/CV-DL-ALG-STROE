@@ -11,6 +11,7 @@ CV算法工程师知识体系
 - Image Processing
 - Pattern Recognition
 - Machine Learing
+- Linux Sysytem Programing
 
 
 
