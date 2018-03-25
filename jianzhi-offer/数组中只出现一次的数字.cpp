@@ -2,12 +2,17 @@
 一个整型数组里除了两个数字之外，其他的数字都出现了两次。请写程序找出这两个只出现一次的数字。
 */
 
+/*
+思路一：哈希表思想，空间复杂度O(n)，时间复杂度O(n)
+思路二：位操作异或，首先异或所有数求出sum，然后检查sum二进制中哪个最低位是1的，我们找他出来。再根据这个位是否为1
+继续划分成两个数组，继续使用异或求出各自数组中只出现一次的数。空间复杂度O（n），时间复杂度O（n）
+*/
+
 
 class Solution {
 public:
     void FindNumsAppearOnce(vector<int> data,int* num1,int *num2) {
         map<int,int> m_map;
-
         for(int i=0;i<data.size();i++)
         {
             m_map[data[i]] += 1;
@@ -67,7 +72,6 @@ public:
         {
             *num2 = *num2 ^ vec2[i];
         }
-
     }
 };
 #endif
