@@ -311,3 +311,31 @@ STL内存分配分为一级分配器和二级分配器，一级分配器就是�
 ### 怎么判断大小端？
 
 ### 单例模式线程安全的写法
+
+### 全局变量和static变量的区别
+
+### 如果在两个.h文件中声明两个同名变量会怎么样？ 如果使用extern 如果没有使用?
+
+
+### 什么是柔性数组？
+```
+typedef struct test  
+{  
+    int a;  
+    double b;  
+    char c[0];  
+};  
+
+//有些编译器会报错无法编译可以改成：
+typedef struct test  
+{  
+    int a;  
+    double b;  
+    char c[];  
+};  
+
+//通过如下表达式给结构体分配内存：
+test *stpTest = (test *)malloc(sizeof(test)+100*sizeof(char));  
+```
+c就是一个柔性数组成员，如果把stpTest指向的动态分配内存看作一个整体，c就是一个长度可以动态变化的结构体成员，柔性一词来源于此。c的长度为0，因此它不占用test的空间，同时stpTest->c就是“hello world”的首地址，不需要再使用( char * )( stpTest + 1 )这么丑陋的代码了。那个0个元素的数组没有占用空间，而后我们可以进行变长操作了。这样我们为结构体指针c分配了一块内存。用stpTest->c[n]就能简单地访问可变长元素。
+
