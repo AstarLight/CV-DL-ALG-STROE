@@ -108,7 +108,7 @@ df命令使用的事statfs这个系统调用，直接读取分区的超级块信
 
 ### 如何查看端口使用情况？
 - lsof -i  
-- lsof -i:端口号
+- lsof -i：端口号
 - netstat -tunlp
 - netstat -tunlp|grep 端口号
 
