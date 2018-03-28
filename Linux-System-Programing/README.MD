@@ -90,6 +90,110 @@ SIGINT，SIGKILL(不能被捕获)，SIGTERM(可以被捕获)，SIGSEGV，SIGCHLD
 ### 虚拟内存的作用和实现
 
 ### 孤儿进程与僵死进程
+孤儿进程：一个父进程退出，而它的一个或多个子进程还在运行，那么那些子进程将成为孤儿进程。孤儿进程将被init进程(进程号为1)所收养，并由init进程对它们完成状态收集工作。
+
+僵尸进程：一个进程使用fork创建子进程，如果子进程退出，而父进程并没有调用wait或waitpid获取子进程的状态信息，那么子进程的进程描述符仍然保存在系统中。这种进程称之为僵死进程。如果进程不调用wait / waitpid的话， 那么保留的那段信息就不会释放，其进程号就会一直被占用，但是系统所能使用的进程号是有限的，如果大量的产生僵死进程，将因为没有可用的进程号而导致系统不能产生新的进程. 此即为僵尸进程的危害，应当避免。
+
+### 僵尸进程解决办法？
+1.通过信号机制
+
+子进程退出时向父进程发送SIGCHILD信号，父进程处理SIGCHILD信号。在信号处理函数中调用wait进行处理僵尸进程。测试程序如下所示：
+```
+#include <stdio.h>
+#include <unistd.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <signal.h>
+
+static void sig_child(int signo);
+
+int main()
+{
+    pid_t pid;
+    //创建捕捉子进程退出信号
+    signal(SIGCHLD,sig_child);
+    pid = fork();
+    if (pid < 0)
+    {
+        perror("fork error:");
+        exit(1);
+    }
+    else if (pid == 0)
+    {
+        printf("I am child process,pid id %d.I am exiting.\n",getpid());
+        exit(0);
+    }
+    printf("I am father process.I will sleep two seconds\n");
+    //等待子进程先退出
+    sleep(2);
+    //输出进程信息
+    system("ps -o pid,ppid,state,tty,command");
+    printf("father process is exiting.\n");
+    return 0;
+}
+
+static void sig_child(int signo)
+{
+     pid_t        pid;
+     int        stat;
+     //处理僵尸进程
+     while ((pid = waitpid(-1, &stat, WNOHANG)) >0)
+            printf("child %d terminated.\n", pid);
+}
+```
+
+2.fork两次
+
+《Unix 环境高级编程》8.6节说的非常详细。原理是将子进程成为孤儿进程，从而其的父进程变为init进程，通过init进程可以处理僵尸进程。测试程序如下所示：
+```
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+
+int main()
+{
+    pid_t  pid;
+    //创建第一个子进程
+    pid = fork();
+    if (pid < 0)
+    {
+        perror("fork error:");
+        exit(1);
+    }
+    //第一个子进程
+    else if (pid == 0)
+    {
+        //子进程再创建子进程
+        printf("I am the first child process.pid:%d\tppid:%d\n",getpid(),getppid());
+        pid = fork();
+        if (pid < 0)
+        {
+            perror("fork error:");
+            exit(1);
+        }
+        //第一个子进程退出
+        else if (pid >0)
+        {
+            printf("first procee is exited.\n");
+            exit(0);
+        }
+        //第二个子进程
+        //睡眠3s保证第一个子进程退出，这样第二个子进程的父亲就是init进程里
+        sleep(3);
+        printf("I am the second child process.pid: %d\tppid:%d\n",getpid(),getppid());
+        exit(0);
+    }
+    //父进程处理第一个子进程退出
+    if (waitpid(pid, NULL, 0) != pid)
+    {
+        perror("waitepid error:");
+        exit(1);
+    }
+    exit(0);
+    return 0;
+}
+```
 
 ### du和df的区别和联系？
 du，disk usage,是通过搜索文件来计算每个文件的大小然后累加，du能看到的文件只是一些当前存在 
