@@ -45,6 +45,80 @@ umask用于影响新建立文件的默认权限，当新建立一个文件或目
 
 ### TCP自己实现过吗？滑动窗口过程?
 
+### dup/dup2的作用和区别
+有时我们希望把标准输入重定向到一个文件，或者把标准输出重定向到一个网络连接。dup()与dup2()能对输入文件描述符进行重定向。dup重定向标准输出时需要先关闭stdout，而使用dup2时不需要。
+
+dup:
+```
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <string.h>
+
+int main()
+{
+    int fd = open("./a.log", O_CREAT|O_RDWR,0644);
+    close(1);
+    
+    int new_fd = dup(fd);
+    if(new_fd < 0)
+    {
+        perror("dup");
+        return 0;
+    }
+    close(fd);
+    
+    char buf[1024];
+    
+    while(1)
+    {
+        memset(buf,0,sizeof(buf));
+        scanf("%s",buf);
+        if(buf[0] == 'q') break;
+        printf("%s\n",buf);
+        fflush(stdout); //必须做，因为重定向后printf函数将由行缓冲变为全缓冲  
+    }
+    close(new_fd);
+    
+    return 0;
+}
+```
+
+dup2:
+```
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <string.h>
+
+int main()
+{
+    int fd = open("./b.log", O_CREAT|O_RDWR,0644);
+    close(1);
+    
+    int new_fd = dup2(fd,1);
+    if(new_fd < 0)
+    {
+        perror("dup");
+        return 0;
+    }
+    //close(fd);  //使用dup2不需要手动关闭原先的fd，系统自动关
+    
+    char buf[1024];
+    
+    while(1)
+    {
+        memset(buf,0,sizeof(buf));
+        scanf("%s",buf);
+        if(buf[0] == 'q') break;
+        printf("%s\n",buf);
+        fflush(stdout); //必须做，因为重定向后printf函数将由行缓冲变为全缓冲  
+    }
+    close(new_fd);
+    
+    return 0;
+}
+```
 
 ### sed, awk, grep的作用？
 三个超强大的命名，分别用与格式化修改，统计，和正则查找
