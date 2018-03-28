@@ -7,6 +7,13 @@
 - 计算机网络
 - 操作系统
 
+### GCC的编译过程分为那几步？
+预处理、编译、汇编和链接４个步骤。
+- 预处理，生成预编译文件：gcc -E hello.c -o hello.i
+- 编译，生成汇编代码：gcc -S hello.i -o hello.s
+- 汇编，生成目标文件：gcc -c hello.s -o hello.o
+- 链接，生成可执行文件：gcc hello.o -o hello
+
 
 ### init进程的PID是多少？
 空闲进程（当没有其他进程在运行时，内核所运行的进程，PID为0），在启动后，内核运行的第一个进程交init进程，PID为1
