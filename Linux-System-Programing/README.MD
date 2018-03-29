@@ -329,6 +329,144 @@ int main(int argc, char *argv[])
 
 消息队列( message queue ) ： 消息队列是由消息的链表，存放在内核中并由消息队列标识符标识。消息队列克服了信号传递信息少、管道只能承载无格式字节流以及缓冲区大小受限等缺点。
 
+查看msgqid的方法：ipcs -q
+
+msg_recv:
+```
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define BUF_SIZE 256
+#define MSG_TYPE 100
+
+typedef struct 
+{
+    long mtype;
+    char mtext[BUF_SIZE];
+}msg_info_t;
+
+int recv_msg(int msqid, int msg_type, char msg[])
+{
+    int result;
+    msg_info_t buffer;
+    buffer.mtype = msg_type;
+
+    result = msgrcv(msqid, &buffer, BUF_SIZE, msg_type, 0);
+    if(result == -1)
+    {
+        perror("cannot receive msg from msg queue!\n");
+    }
+
+    strcpy(msg, buffer.mtext);
+
+    return result;
+}
+
+int main(int argc, char *argv[])
+{
+    int msqid = atoi(argv[1]);
+
+    char buf[BUF_SIZE] = {0};
+    while(1)
+    {
+        if(recv_msg(msqid, MSG_TYPE, buf) == -1)
+        {
+            perror("cannot get msg!\n");
+            return -1;
+        }
+        else
+        {
+            printf("recv msg: %s\n",buf);
+        }
+    }
+
+    return 0;
+}
+```
+msg_send:
+```
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <unistd.h>
+#include <string.h>
+
+#define BUF_SIZE 256
+#define MYKEY 168
+#define MSG_TYPE 100
+
+typedef struct 
+{
+    long mtype;
+    char mtext[BUF_SIZE];
+}msg_info_t;
+
+int create_msg_queue()
+{
+    key_t key;
+    int msqid;
+    key = MYKEY;
+
+    msqid = msgget(key, IPC_CREAT|0660);
+    if(msqid == -1)
+    {
+        perror("cannot create msg queue!\n");
+        return -1;
+    }
+
+    return msqid;
+}
+
+int send_msg(int msqid, char msg[])
+{
+    int result;
+    msg_info_t buf;
+
+    buf.mtype = MSG_TYPE;
+    strcpy(buf.mtext, msg);
+
+    result = msgsnd(msqid, &buf, strlen(msg), 0);
+    if(result == -1)
+    {
+        perror("cannot send msg to msg queue!\n");
+        return -1;
+    }
+
+    return result;
+}
+
+int main()
+{
+    int msqid;
+    if(msqid=create_msg_queue() < 0)
+    {
+        perror("fail to create msg queue!\n");
+        return -1;
+    }
+
+    char str[] = "hello friend!\n";
+    
+    while(1)
+    {
+        if(send_msg(msqid, str) < 0)
+        {
+            perror("fail to send msg to msg queue!\n");
+            return -1;
+        }
+
+        sleep(1);
+    }
+
+    return 0;
+}
+```
+
 共享内存( shared memory ) ：共享内存就是映射一段能被其他进程所访问的内存，这段共享内存由一个进程创建，但多个进程都可以访问。共享内存是最快的 IPC 方式，它是针对其他进程间通信方式运行效率低而专门设计的。通常是由一个进程开辟一块共享内存区域，然后允许多个进程对此区域进行访问。由于不需要使用中间介质，而是数据由内存直接映射到进程空间，因此共享内存是最快速的进程间通信机制。它往往与其他通信机制，如信号量，配合使用，来实现进程间的同步和通信。(原理一定要清楚，常考)
 ```
 #include <sys/types.h>
