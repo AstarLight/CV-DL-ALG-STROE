@@ -214,7 +214,7 @@ sed:
 - sed -e 's/w1/& w2/' file  （w1的地方输出 w1 w2）
 - sed 's/book/books/' file (替换文本中book为books)
 - sed -i 's/book/books/g' file （全局替换：换文本中book为books）
-- sed 's/sk/SK/2g' （从第2个匹配时开始替换）
+- sed -i 's/sk/SK/2g' file（从第2个匹配时开始替换）
 
 ### http和https的区别？
 HTTPS和HTTP的区别主要如下：
