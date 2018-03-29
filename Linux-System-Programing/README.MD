@@ -200,6 +200,22 @@ int main()
 ### sed, awk, grep的作用？
 三个超强大的命名，分别用与格式化修改，统计，和正则查找
 
+记一下比较经典的操作：
+sed:
+- sed -e '1d' inputfile (删除第一行)
+- sed -e 'x1d' -e 'x2d' -e 'x3d' inputfile  (删除第x1,x2,x3行)
+- sed -e '1,3d' file (删除第一到第三行)
+- sed -e '1,$d' file  (删除第一行到最后一行)
+- sed -e '/#/d' file  (删除含有'#'号的行)
+- sed -e '/xx/!d' file (删除除含有字符串xx的所有行)
+- sed -e '/t.*t/d' file     (删除含有两个t的行)
+- sed -e 'nc/just do it' file  (把第n行替换成just do it)
+- sed -e '1,10c/I can do it' file  (把1到10行替换成一行:I can do it)
+- sed -e 's/w1/& w2/' file  （w1的地方输出 w1 w2）
+- sed 's/book/books/' file (替换文本中book为books)
+- sed -i 's/book/books/g' file （全局替换：换文本中book为books）
+- sed 's/sk/SK/2g' （从第2个匹配时开始替换）
+
 ### http和https的区别？
 HTTPS和HTTP的区别主要如下：
 
