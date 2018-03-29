@@ -329,7 +329,119 @@ int main(int argc, char *argv[])
 
 消息队列( message queue ) ： 消息队列是由消息的链表，存放在内核中并由消息队列标识符标识。消息队列克服了信号传递信息少、管道只能承载无格式字节流以及缓冲区大小受限等缺点。
 
-共享内存( shared memory ) ：共享内存就是映射一段能被其他进程所访问的内存，这段共享内存由一个进程创建，但多个进程都可以访问。共享内存是最快的 IPC 方式，它是针对其他进程间通信方式运行效率低而专门设计的。它往往与其他通信机制，如信号两，配合使用，来实现进程间的同步和通信。(原理一定要清楚，常考)
+共享内存( shared memory ) ：共享内存就是映射一段能被其他进程所访问的内存，这段共享内存由一个进程创建，但多个进程都可以访问。共享内存是最快的 IPC 方式，它是针对其他进程间通信方式运行效率低而专门设计的。通常是由一个进程开辟一块共享内存区域，然后允许多个进程对此区域进行访问。由于不需要使用中间介质，而是数据由内存直接映射到进程空间，因此共享内存是最快速的进程间通信机制。它往往与其他通信机制，如信号量，配合使用，来实现进程间的同步和通信。(原理一定要清楚，常考)
+```
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <string.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define SHM_SIZE 1024
+#define MYKEY 24
+
+int main(int argc, char const *argv[])
+{
+	if(argc != 2)
+	{
+		perror("Invalid input!Usage: %s (1|2)\n");
+		return -1;
+	}
+	if(atoi(argv[1]) == 1)  //write msg to shared memory
+	{
+		key_t key;
+		int shmid;
+		char* shm_addr;
+
+		key = ftok("./", MYKEY);
+		if(key == -1)
+		{
+			perror("cannot generate the IPC key!\n");
+			return -1;
+		}
+
+		shmid = shmget(key, SHM_SIZE, IPC_CREAT|0660);
+		if(shmid == -1)
+		{
+			perror("cannot create a shared memory segment!\n");
+			return -1;
+		}
+
+		shm_addr = (char*)shmat(shmid,NULL,0);
+		if(shm_addr == (char*)-1)
+		{
+			perror("cannot attach the shared memory to process!\n");
+			return -1;
+		}
+
+		while(1)
+		{
+			printf("input:");
+			scanf("%s",shm_addr);			
+		}
+
+	}
+	else if(atoi(argv[1]) == 2)  // read msg from shared memory
+	{
+		key_t key;
+		int shmid;
+		char* shm_addr;
+
+		key = ftok("./", MYKEY);
+		if(key == -1)
+		{
+			perror("cannot generate the IPC key!\n");
+			return -1;
+		}
+		//创建共享内存
+		shmid = shmget(key, SHM_SIZE, IPC_CREAT|0660);
+		if(shmid == -1)
+		{
+			perror("cannot create a shared memory segment!\n");
+			return -1;
+		}
+		//将共享内存地址连接到进程地址上
+		shm_addr = (char*)shmat(shmid,NULL,0);
+		if(shm_addr == (char*)-1)
+		{
+			perror("cannot attach the shared memory to process!\n");
+			return -1;
+		}
+		int read_conut = 0;
+		while(1)
+		{
+			if(read_conut > 20)
+				break;
+			printf("out:%s\n",shm_addr);
+			sleep(3);
+			read_conut++;
+		}
+
+		//分离共享内存
+		if(shmdt(shm_addr) == -1)
+	    	{
+	        	perror("shmdt department error!\n");
+	        	return -1;
+	    	}
+
+	    	// 删除共享内存
+	    	if(shmctl(shmid, IPC_RMID, 0) == -1)
+	    	{
+	        	perror("shmctl delete error!\n");
+	        	return -1;
+	    	}
+	}
+	else
+	{
+		perror("Invalid input!Usage: %s (1|2)\n");
+		return -1;		
+	}
+
+	return 0;
+}
+```
 
 信号 ( sinal ) ： 信号是一种比较复杂的通信方式，用于通知接收进程某个事件已经发生，常见的信号。
 
