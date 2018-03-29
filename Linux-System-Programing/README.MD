@@ -234,6 +234,96 @@ int main()
 管道( pipe )：管道是一种半双工的通信方式，数据只能单向流动，而且只能在具有亲缘关系的进程间使用。进程的亲缘关系通常是指父子进程关系。
 
 命名管道 (FIFO) ： 有名管道也是半双工的通信方式，但是它允许无亲缘关系进程间的通信。
+```
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define FIFO_CHANNEL "./fifo.channel"
+#define BUF_SIZE 256
+
+int main(int argc, char *argv[])
+{
+    int fd;
+    int pid;
+    char recv_buf[BUF_SIZE] = {0};
+    
+    if(argc != 2)
+    {
+    	printf("Invalid input! Corrected usage: %s (1|2) \n",argv[0]);
+    	return -1;
+    }
+
+    //write msg to fifo
+    if(atoi(argv[1]) == 1)
+    {
+    	int count = 1;
+    	if(mkfifo(FIFO_CHANNEL,0777) == -1)
+    	{
+    		perror("cannot create fifo channel!\n");
+    		return -1;
+    	}
+
+    	fd = open(FIFO_CHANNEL,O_WRONLY);
+    	if(fd == -1)
+    	{
+    		perror("cannot open FIFO\n");
+    		return -1;
+    	}
+    	while(1)
+    	{
+	    	char s_msg[128] = {0};
+	    	sprintf(s_msg,"%d msg to other process.\n",count++);
+	    	//注意，如果没有fifo，另一端没有进程读取数fifo数据，write将一直拥塞
+	    	if(write(fd,s_msg,strlen(s_msg)) == -1)
+	    	{
+	    		perror("process cannot write data to  fifo!\n");
+	    		return -1;
+	    	}
+	    	else
+	    	{
+	    		printf("send msg: %s\n",s_msg);
+	    	}
+	    	sleep(1);
+    	}
+    }
+    else if (atoi(argv[1]) == 2)  //receive msg from fifo
+    {
+    	fd = open(FIFO_CHANNEL,O_RDONLY);
+    	if(fd == -1)
+    	{
+    		perror("cannot open the FIFO\n");
+    		return -1;
+    	}
+    	while(1)
+    	{
+            //注意，如果没有fifo，另一端没有进程向fifo写数据，read将一直拥塞
+	    	if(read(fd,recv_buf,BUF_SIZE) == -1)
+	    	{
+	    		perror("process cannot read data from fifo!\n");
+	    		memset(recv_buf,0,BUF_SIZE);
+	    	}
+	    	else
+	    	{
+	    		printf("receive msg from fifo : %s\n",recv_buf);
+	    	}
+    	}
+    }
+    else
+    {
+    	printf("Invalid input! Corrected usage: %s (1|2) \n",argv[0]);
+    	return -1;
+    }
+
+    return 0;
+}
+
+```
 
 信号量：信号量用于实现进程间的互斥与同步，而不是用于存储进程间通信数据，有XSI信号量和POSIX信号量，POSIX信号量更加完善。
 
@@ -247,6 +337,9 @@ int main()
 
 ### 匿名管道与命名管道的区别?
 匿名管道只能在具有公共祖先的两个进程间使用。
+
+### 怎么实现管道的双向通信？
+在Linux系统中，管道只能实现单向通信，因此要实现双向通信，必须创建两个管道：一个作为读取数据的管道，一个作为写入数据的管道。
 
 ### 常见的信号有哪些？
 SIGINT，SIGKILL(不能被捕获)，SIGTERM(可以被捕获)，SIGSEGV，SIGCHLD，SIGALRM
