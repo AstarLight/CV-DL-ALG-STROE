@@ -395,14 +395,14 @@ int main(int argc, char const *argv[])
 			perror("cannot generate the IPC key!\n");
 			return -1;
 		}
-		//创建共享内存
+
 		shmid = shmget(key, SHM_SIZE, IPC_CREAT|0660);
 		if(shmid == -1)
 		{
 			perror("cannot create a shared memory segment!\n");
 			return -1;
 		}
-		//将共享内存地址连接到进程地址上
+
 		shm_addr = (char*)shmat(shmid,NULL,0);
 		if(shm_addr == (char*)-1)
 		{
@@ -419,19 +419,19 @@ int main(int argc, char const *argv[])
 			read_conut++;
 		}
 
-		//分离共享内存
+		
 		if(shmdt(shm_addr) == -1)
-	    	{
-	        	perror("shmdt department error!\n");
-	        	return -1;
-	    	}
+	    {
+	        perror("shmdt department error!\n");
+	        return -1;
+	    }
 
-	    	// 删除共享内存
-	    	if(shmctl(shmid, IPC_RMID, 0) == -1)
-	    	{
-	        	perror("shmctl delete error!\n");
-	        	return -1;
-	    	}
+	    // 删除共享内存
+	    if(shmctl(shmid, IPC_RMID, 0) == -1)
+	    {
+	        perror("shmctl delete error!\n");
+	        return -1;
+	    }
 	}
 	else
 	{
