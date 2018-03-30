@@ -286,6 +286,13 @@ extern "C"的主要作用就是为了能够正确实现C++代码调用其他C语
 ### 如何检测内存泄漏
 自己重载new操作符，用list或者map对分配的内存进行收集，如果释放了，就删除节点，最后检测容器里面还有没有节点，有就是泄露了，也可以记录是哪一行的代码分配的内存被泄露了，这都看你想要记录什么。最终可以生成报告给自己去分析。
 
+存泄漏通常是指堆内存的泄漏，也就是通过malloc、calloc函数申请的内存，因此内存泄漏的检测方法核心思想就是通过宏定义自定义内存分配及释放函数来替换用户的malloc、calloc、free等函数。申请信息，申请内存时，记录并插入到全局的链表中；释放内存时从全局链表中查找对应的记录，并删除。程序结束时，将链表中信息写入文件，并清除链表。
+```
+#define malloc(size) malloc_detector(size,__FILE__,__LINE__)
+#define calloc(element_num,element_size) calloc_detector (element_num,element_size,__FILE__,__LINE__)
+#define free(addr) free_detector(addr)
+```
+
 使用工具：Linux下通过工具valgrind检测
 
 ### 讲讲大端小端，如何检测？
@@ -393,4 +400,4 @@ explict关键字
 ### C++函数栈空间的最大值 ？
 默认是1M，不过可以调整。
 
-### 
+### 怎么重载前置++，后置++，+，new？
