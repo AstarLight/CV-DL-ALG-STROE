@@ -619,6 +619,32 @@ int main(int argc, char const *argv[])
 ### 常见的信号有哪些？
 SIGINT，SIGKILL(不能被捕获)，SIGTERM(可以被捕获)，SIGSEGV，SIGCHLD，SIGALRM
 
+### 线程同步的方式有哪几种？
+互斥锁、信号量、条件变量
+- 互斥锁
+```
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+int pthread_mutex_lock(pthread_mutex *mutex);
+int pthread_mutex_unlock(pthread_mutex_t *mutex);
+int pthread_mutex_destroy(pthread_mutex *mutex);
+```
+- 信号量
+```
+int sem_init (sem_t *sem , int pshared, unsigned int value);
+int sem_wait(sem_t *sem);
+int sem_post(sem_t *sem);
+int sem_destroy(sem_t *sem);
+```
+
+- 条件变量:条件变量用来自动阻塞一个线程，直到某特殊情况发生为止。通常条件变量和互斥锁同时使用。条件变量分为两部分: 条件和变量。条件本身是由互斥量保护的。线程在改变条件状态前先要锁住互斥量。条件变量使我们可以睡眠等待某种条件出现。条件变量是利用线程间共享的全局变量进行同步的一种机制，主要包括两个动作：一个线程等待"条件变量的条件成立"而挂起；另一个线程使"条件成立"（给出条件成立信号）。条件的检测是在互斥锁的保护下进行的。如果一个条件为假，一个线程自动阻塞，并释放等待状态改变的互斥锁。如果另一个线程改变了条件，它发信号给关联的条件变量，唤醒一个或多个等待它的线程，重新获得互斥锁，重新评价条件。
+```
+pthread_cond_t cond = PTHREAD_COND_INITIALIER;
+int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);
+int pthread_cond_signal(pthread_cond_t *cond);
+int pthread_cond_broadcast(pthread_cond_t *cond); //解除所有线程的阻塞
+int pthread_cond_destroy(pthread_cond_t *cond);
+```
+
 ### 虚拟内存的作用和实现
 
 ### 孤儿进程与僵死进程
