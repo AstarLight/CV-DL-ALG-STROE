@@ -508,12 +508,12 @@ explict关键字
 默认是1M，不过可以调整。
 
 ### 怎么重载前置++，后置++，+，new？
+```
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
 
 using namespace std;
-
 
 class A
 {
@@ -603,6 +603,7 @@ int main()
 
     return 0;
 }
+```
 
 ### 哪些排序是稳定排序？
 ![](./1156494-62f859c2ac6f95ff.png) 
