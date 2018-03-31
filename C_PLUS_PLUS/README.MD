@@ -508,6 +508,101 @@ explict关键字
 默认是1M，不过可以调整。
 
 ### 怎么重载前置++，后置++，+，new？
+#include <iostream>
+#include <stdlib.h>
+#include <stdio.h>
+
+using namespace std;
+
+
+class A
+{
+private:
+    int a;
+    int b;
+    int c[3];
+public:
+    A(int a,int b)
+    {
+        this->a = a;
+        this->b = b;
+        c[0] = 1;
+        c[1] = 2;
+        c[2] = 3;
+    }
+
+    inline bool operator ==(const A& as) const
+    {
+        if(this->a == as.a && this->b == as.b)
+            return true;
+        else
+            return false;
+    }
+
+
+    inline int operator +(const A& as)const
+    {
+        return this->a + as.a;
+    }
+
+    A operator ++() //前增量,++i 
+    {
+        this->a++;
+        this->b++;
+        return *this;
+    }
+
+    A operator ++(int)  //后增量,i++
+    {
+        A tmp(*this);
+        this->a++;
+        this->b+1;
+        return tmp;
+    }
+
+    int& operator [](int i)
+    {
+        return this->c[i];
+    }
+
+    friend ostream& operator <<(ostream& out, const A& as)
+    {
+        out<<"("<<as.a<<","<<as.b<<")";
+        return out;
+    }
+
+    friend istream& operator >>(istream& in, A& as)
+    {
+        in >> as.a >> as.b;
+        return in;
+    }
+};
+
+
+//对于全局重载操作符，代表左操作数的参数必须被显式指定
+
+void* operator new(size_t size, const char* file, unsigned int line) 
+{
+    void* ptr = malloc(size);
+    printf("%s,line:%d",file,line);
+    return ptr;
+}
+
+
+int main()
+{
+    A test_a(2,3);
+    A test_b(2,3);
+    if(test_a == test_b)
+        cout<<"euqal!"<<endl;
+    else
+        cout<<"not equal!"<<endl;
+
+    //cout<<"add:"<<test_a + test_b<<endl;
+    cout<<test_b<<endl;
+
+    return 0;
+}
 
 ### 哪些排序是稳定排序？
 ![](./1156494-62f859c2ac6f95ff.png) 
