@@ -310,6 +310,32 @@ extern "C"的主要作用就是为了能够正确实现C++代码调用其他C语
 #define free(addr) free_detector(addr)
 ```
 
+```
+//---------------------------------------------------------------
+// 重载new,new[],delete,delete[] 
+//---------------------------------------------------------------
+void* operator new(size_t size, const char* file, unsigned int line) {
+  void* ptr = malloc(size);
+  mem_stack.Insert(ptr, file, line);
+  return ptr;
+}
+void* operator new[](size_t size, const char* file, unsigned int line) {
+  return operator new(size, file, line); // 不能用new 
+}
+void operator delete(void* ptr) {
+  free(ptr);
+  mem_stack.Delete(ptr);
+}
+void operator delete[](void* ptr) {
+  operator delete(ptr);
+}
+
+//---------------------------------------------------------------
+// 使用宏将带测试代码中的new和delte替换为重载的new和delete 
+//---------------------------------------------------------------
+#define new new(__FILE__,__LINE__)
+```
+
 使用工具：Linux下通过工具valgrind检测
 
 ### 讲讲大端小端，如何检测？
