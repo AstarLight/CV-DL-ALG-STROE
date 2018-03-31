@@ -196,11 +196,74 @@ int main() {
 智能指针和普通指针的区别在于智能指针实际上是对普通指针加了一层封装机制，这样的一层封装机制的目的是为了使得智能指针可以方便的管理一个对象的生命期。智能指针实质是一个对象，行为表现的却像一个指针。
 智能指针共分为4种，即boost库中的auto_ptr、scoped_ptr、shared_ptr、weak_ptr。
 
-- auto_ptr:auto_ptr 基于【排他所有权模式】，这意味着：两个指针（同类型）不能指向同一个资源，复制或赋值都会改变资源的所有权。
-- scoped_ptr:这是比较简单的一种智能指针，正如其名字所述，scoped_ptr所指向的对象在作用域之外会自动得到析构
-- shared_ptr:shared_ptr中所实现的本质是引用计数(reference counting)，也就是说shared_ptr是支持复制的，复制一个shared_ptr的本质是对这个智能指针的引用次数加1，而当这个智能指针的引用次数降低到0的时候，该对象自动被析构
-- unique_ptr:uniq_ptr持有对对象的独有权——两个unique_ptr不能指向一个对象，不能进行复制操作只能进行移动操作。
-- weak_ptr:weak_ptr是为了配合shared_ptr而引入的一种智能指针，因为它不具有普通指针的行为，没有重载operator*和->,它的最大作用在于协助shared_ptr工作，像旁观者那样观测资源的使用情况。weak_ptr可以从一个shared_ptr或者另一个weak_ptr对象构造，获得资源的观测权。但weak_ptr没有共享资源，它的构造不会引起指针引用计数的增加。使用weak_ptr的成员函数use_count()可以观测资源的引用计数，另一个成员函数expired()的功能等价于use_count()==0,但更快，表示被观测的资源(也就是shared_ptr的管理的资源)已经不复存在。
+- auto_ptr:auto_ptr 基于【排他所有权模式】，这意味着：两个指针（同类型）不能指向同一个资源，复制或赋值都会改变资源的所有权。auto_ptr的析构函数内部释放资源时调用的是delete而不是delete[]，因此不要让auto_ptr托管数组
+- scoped_ptr:这是比较简单的一种智能指针，正如其名字所述，scoped_ptr所指向的对象在作用域之外会自动得到析构。但是scoped_ptr的所有权更加严格，不能转让，一旦scoped_pstr获取了对象的管理权，你就无法再从它那里取回来。
+- shared_ptr:shared_ptr中所实现的本质是引用计数(reference counting)，也就是说shared_ptr是支持复制的，复制一个shared_ptr的本质是对这个智能指针的引用次数加1，而当这个智能指针的引用次数降低到0的时候，该对象自动被析构。shared_ptr不能对循环引用的对象的内存进行自动管理
+- unique_ptr:unique_ptr持有对对象的独有权——两个unique_ptr不能指向一个对象，不能进行复制操作只能进行移动操作。同一时刻只能有一个unique_ptr指向给定对象但可以转移所有权。
+- weak_ptr:weak_ptr是为了配合shared_ptr而引入的一种智能指针，因为它不具有普通指针的行为，没有重载operator*和->,它的最大作用在于协助shared_ptr工作，像旁观者那样观测资源的使用情况。weak_ptr可以从一个shared_ptr或者另一个weak_ptr对象构造，获得资源的观测权。但weak_ptr没有共享资源，它的构造不会引起指针引用计数的增加。有点像普通指针。
+
+使用weak_ptr解决循环引用
+```
+class B;
+class A
+{
+public:
+    A()
+    {
+        cout << "Class A Constructor is called." << endl;
+    }
+
+    ~A()
+    {
+        cout << "Class A Deconstructor is called." << endl;
+    }
+
+    // tr1::shared_ptr<B> m_shB;
+    tr1::weak_ptr<B> m_shB;
+};
+
+class B
+{
+public:
+    B()
+    {
+        cout << "Class B Constructor is called." << endl;
+    }
+
+    ~B()
+    {
+        cout << "Class B Deconstructor is called." << endl;
+    }
+
+    tr1::shared_ptr<A> m_shA;
+};
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+    {
+        // 测试重复引用
+        tr1::shared_ptr<A> shA(new A());
+        tr1::shared_ptr<B> shB(new B());
+        
+        if (shA && shB)
+        {
+            shA->m_shB = shB;
+            shB->m_shA = shA;
+        }
+
+        cout << "A的引用计数：" << shA.use_count() << " B的引用计数：" << shB.use_count() << endl;
+      
+        cout << "要离开shA和shB的作用域了，正常情况下在这之后会执行shA和shB的析构函数的" << endl;
+            
+       // 这里是要执行析构函数的
+       // 首先，会执行shB这个B对象的析构函数，要析构B的话，得先去判断下托管B的shared_ptr的引用计数，
+       //       这里是1，所以去析构B，B析构后紧接着去析构其成员对象A，此时A的引用计数为2，所以会使A的引用计数减为1
+       // 然后，会执行shA这个A对象的析构函数，要析构A的话，也得先去判断下托管的A的shared_ptr的引用计数，这里是1，它可以析构
+    }
+
+    cout << "已经离开shA和shB的作用域了，请观察shA和shB的析构函数有没有被执行" << endl;
+}
+```
 
 ### 纯虚函数如何定义，为什么对于存在虚函数的类中析构函数要定义成虚函数？
 为了实现多态进行动态绑定，将派生类对象指针绑定到基类指针上，对象销毁时，如果析构函数没有定义为析构函数，则会调用基类的析构函数，显然只能销毁部分数据。如果要调用对象的析构函数，就需要将该对象的析构函数定义为虚函数，销毁时通过虚函数表找到对应的析构函数。
