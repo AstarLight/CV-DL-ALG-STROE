@@ -810,6 +810,79 @@ du命令会对待统计文件逐个调用fstat这个系统调用，获取文件�
 df命令使用的事statfs这个系统调用，直接读取分区的超级块信息获取分区使用情况。它的数据是基于分区元数据的，所以只能针对整个分区。由于df直接读取超级块，所以运行速度不受文件多少影响。
 
 ### 内存映射是什么?
+mmap是一种内存映射文件的方法，即将一个文件或者其它对象映射到进程的地址空间，实现文件磁盘地址和进程虚拟地址空间中一段虚拟地址的一一对映关系。
+
+1. 通过以上的分析，发现应用程序通过read,write,ioctl来访问硬件设备，它们都要经过两次的数据拷贝，一次是用户空间和内核空间的数据拷贝，另外一次是内核空间和硬件之间的数据拷贝
+2. 用户访问设备，最终其实涉及的用户和硬件，而read,write,ioctl本身会牵扯到内核，所以这些函数涉及2次的数据拷贝，用户要直接去访问硬件设备，只需要将硬件设备的物理地址信息映射到用户的虚拟地址空间即可，一旦完毕，不会在牵扯到内核空间，以后用户直接访问用户的虚拟地址就是在访问设备硬件，由2次的数据拷贝的
+转换为一次的数据拷贝。(mmap)
+
+MMAP内存映射区作用：目的：将硬件物理地址映射到用户虚拟地址空间，由2次数据拷贝变成1次数据拷贝！
+
+让用户程序直接访问设备内存，在要求高性能的应用当中比较常用。应用程序使用的动态库映射到这个区域；
+应用程序调用mmap，将设备物理地址和这个区域的虚拟内存进行映射；
+mmap映射内存必须是页面大小的整数倍（也就是字节/4K）.当访问的文件比较小时，可以用read、write，文件比较大时，用mmap
+
+```
+/*
+ * mmap file to memory
+ * ./mmap1 data.txt
+ */
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[])
+{
+        int fd = -1;
+        struct stat sb;
+        char *mmaped = NULL;
+
+        fd = open(argv[1], O_RDWR);
+        if (fd < 0) {
+                fprintf(stderr, "open %s fail\n", argv[1]);
+                exit(-1);
+        }
+
+        if (stat(argv[1], &sb) < 0) {
+                fprintf(stderr, "stat %s fail\n", argv[1]);
+                goto err;
+        }
+
+        /* 将文件映射至进程的地址空间 */
+        mmaped = (char *)mmap(NULL, sb.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+        if (mmaped == (char *)-1) {
+                fprintf(stderr, "mmap fail\n");
+                goto err;
+        }
+
+        /* 映射完后, 关闭文件也可以操纵内存 */
+        close(fd);
+        printf("%s", mmaped);
+
+        mmaped[5] = '$';
+        if (msync(mmaped, sb.st_size, MS_SYNC) < 0) {
+                fprintf(stderr, "msync fail\n");
+                goto err;
+        }
+        
+        printf("%s",mmaped);
+
+        return 0;
+
+err:
+        if (fd > 0)
+                close(fd);
+
+        if (mmaped != (char *)-1)
+                munmap(mmaped, sb.st_size);
+
+        return -1;
+}
+
+```
 
 ### timewait状态的时候，可以接受到新的请求吗？
 
