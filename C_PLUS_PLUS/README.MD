@@ -160,7 +160,7 @@ for(auto iter = myvec.begin(); iter != myvec.end())
 for(autoiter = myset.begin(); iter != myset.end())
 {
     if(delete iter)
-        iter = myset.erase(iter++);
+        myset.erase(iter++);
     else
         iter++;
 }
