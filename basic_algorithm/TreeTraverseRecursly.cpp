@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <algorithm>
 
+using namespace std;
 
 struct ListNode
 {
@@ -17,6 +19,7 @@ void Bulid_BST(ListNode* &root, int str[], int n);
 void PreOrder(ListNode* root);
 void InOrder(ListNode* root);
 void PostOrder(ListNode* root);
+void LevelOrder(ListNode* root);
 
 
 int main()
@@ -26,7 +29,7 @@ int main()
     ListNode* pRoot;
     Bulid_BST(pRoot, key_words, num);
 
-    PreOrder(pRoot);
+    LevelOrder(pRoot);
 
     return 0;
 }
@@ -97,5 +100,49 @@ void PostOrder(ListNode* root)
         PostOrder(root->left);
         PostOrder(root->right);
         visit(root);
+    }
+}
+
+
+
+//递归求树的高度
+int GetDepth(ListNode* root)
+{
+    if(root == NULL)
+        return 0;
+
+    return 1 + max(GetDepth(root->left), GetDepth(root->right));
+}
+
+//注意，传入的root永远是树的根节点
+void VisitNodeAtLevel(ListNode* root,int level)
+{
+    // 空树或层级不合理
+    if (NULL == root || level < 1 )
+        return;
+
+    if (1 == level)
+    {
+        visit(root);
+        return;
+    }
+
+    // 左子树的 level - 1 级
+    VisitNodeAtLevel(root->left,  level - 1);
+
+    // 右子树的 level - 1 级
+    VisitNodeAtLevel(root->right, level - 1);
+}
+
+void LevelOrder(ListNode* root)
+{
+    if(NULL == root)
+        return;
+
+    int depth = GetDepth(root); //先获取树的高度
+
+    for(int i = 1;i<=depth;i++)
+    {
+        VisitNodeAtLevel(root, i);
     }
 }
