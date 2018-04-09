@@ -353,7 +353,247 @@ extern "C"的主要作用就是为了能够正确实现C++代码调用其他C语
 ### 虚函数表是针对类的还是针对对象的？同一个类的两个对象的虚函数表是怎么维护的？
 编译器为每一个类维护一个虚函数表，每个对象的首地址保存着该虚函数表的指针，同一个类的不同对象实际上指向同一张虚函数表。
 
-### 单例模式和工厂模式的实现？
+### 工厂模式的实现？
+简单工厂模式：
+```
+
+enum CTYPE {COREA, COREB};     
+class SingleCore    
+{    
+public:    
+    virtual void Show() = 0;  
+};    
+//单核A    
+class SingleCoreA: public SingleCore    
+{    
+public:    
+    void Show() { cout<<"SingleCore A"<<endl; }    
+};    
+//单核B    
+class SingleCoreB: public SingleCore    
+{    
+public:    
+    void Show() { cout<<"SingleCore B"<<endl; }    
+};    
+//唯一的工厂，可以生产两种型号的处理器核，在内部判断    
+class Factory    
+{    
+public:     
+    SingleCore* CreateSingleCore(enum CTYPE ctype)    
+    {    
+        if(ctype == COREA) //工厂内部判断    
+            return new SingleCoreA(); //生产核A    
+        else if(ctype == COREB)    
+            return new SingleCoreB(); //生产核B    
+        else    
+            return NULL;    
+    }    
+};    
+```
+
+工厂方法模式:
+```
+
+class SingleCore    
+{    
+public:    
+    virtual void Show() = 0;  
+};    
+//单核A    
+class SingleCoreA: public SingleCore    
+{    
+public:    
+    void Show() { cout<<"SingleCore A"<<endl; }    
+};    
+//单核B    
+class SingleCoreB: public SingleCore    
+{    
+public:    
+    void Show() { cout<<"SingleCore B"<<endl; }    
+};    
+class Factory    
+{    
+public:    
+    virtual SingleCore* CreateSingleCore() = 0;  
+};    
+//生产A核的工厂    
+class FactoryA: public Factory    
+{    
+public:    
+    SingleCoreA* CreateSingleCore() { return new SingleCoreA; }    
+};    
+//生产B核的工厂    
+class FactoryB: public Factory    
+{    
+public:    
+    SingleCoreB* CreateSingleCore() { return new SingleCoreB; }    
+}; 
+```
+
+
+
+抽象工厂模式：
+```
+//单核    
+class SingleCore     
+{    
+public:    
+    virtual void Show() = 0;  
+};    
+class SingleCoreA: public SingleCore      
+{    
+public:    
+    void Show() { cout<<"Single Core A"<<endl; }    
+};    
+class SingleCoreB :public SingleCore    
+{    
+public:    
+    void Show() { cout<<"Single Core B"<<endl; }    
+};    
+//多核    
+class MultiCore      
+{    
+public:    
+    virtual void Show() = 0;  
+};    
+class MultiCoreA : public MultiCore      
+{    
+public:    
+    void Show() { cout<<"Multi Core A"<<endl; }    
+    
+};    
+class MultiCoreB : public MultiCore      
+{    
+public:    
+    void Show() { cout<<"Multi Core B"<<endl; }    
+};    
+//工厂    
+class CoreFactory      
+{    
+public:    
+    virtual SingleCore* CreateSingleCore() = 0;  
+    virtual MultiCore* CreateMultiCore() = 0;  
+};    
+//工厂A，专门用来生产A型号的处理器    
+class FactoryA :public CoreFactory    
+{    
+public:    
+    SingleCore* CreateSingleCore() { return new SingleCoreA(); }    
+    MultiCore* CreateMultiCore() { return new MultiCoreA(); }    
+};    
+//工厂B，专门用来生产B型号的处理器    
+class FactoryB : public CoreFactory    
+{    
+public:    
+    SingleCore* CreateSingleCore() { return new SingleCoreB(); }    
+    MultiCore* CreateMultiCore() { return new MultiCoreB(); }    
+};   
+
+```
+
+### 单例模式的实现？
+
+### 策略模式的实现？
+当用户需要选择不同的算法或行为时，如果把这些算法或行为写在一个类里，通过判断来选择的话，这个类将变得非常复杂并且难以维护。策略模式就是构造一个抽象类，具体的算法或者行为继承这个类，让用户来选择。这样做的好处是，可以随时增加或者修改行为，即增加、修改算法或行为的类就可以了。
+
+策略模式和简单工厂模式的差别：
+
+简单工厂模式是通过一个抽象类来构造新对象，用户接触不到具体对象。
+
+策略模式是通过抽象类来选择行为或算法。
+
+```
+//抽象接口  
+class ReplaceAlgorithm  
+{  
+public:  
+    virtual void Replace() = 0;  
+};  
+//三种具体的替换算法  
+class LRU_ReplaceAlgorithm : public ReplaceAlgorithm  
+{  
+public:  
+    void Replace() { cout<<"Least Recently Used replace algorithm"<<endl; }  
+};  
+  
+class FIFO_ReplaceAlgorithm : public ReplaceAlgorithm  
+{  
+public:  
+    void Replace() { cout<<"First in First out replace algorithm"<<endl; }  
+};  
+class Random_ReplaceAlgorithm: public ReplaceAlgorithm  
+{  
+public:  
+    void Replace() { cout<<"Random replace algorithm"<<endl; }  
+};  
+
+//Cache需要用到替换算法  
+class Cache  
+{  
+private:  
+    ReplaceAlgorithm *m_ra;  
+public:  
+    Cache(ReplaceAlgorithm *ra) { m_ra = ra; }  
+    ~Cache() { delete m_ra; }  
+    void Replace() { m_ra->Replace(); }  
+};  
+
+
+int main()  
+{  
+    Cache cache(new LRU_ReplaceAlgorithm()); //暴露了算法的定义  
+    cache.Replace();  
+    return 0;  
+}  
+
+```
+
+### 什么是代理模式？
+- 代理模式：为其它对象提供一种代理以控制对这个对象的访问。
+- 主要解决：在直接访问对象时带来的问题，比如：要访问的对象在远程服务器上。在面向对象系统中，有些对象由于某些原因，直接访问会给使用者或系统带来很多麻烦，可以在访问此对象时加上一个对此对象的访问层。
+
+```
+//统一的抽象接口 IFactory
+class IFactory  
+{  
+public:  
+    IFactory(){}  
+    virtual void makeProduct() = 0;  
+};  
+
+//你的手机工厂
+class PhoneFactory : IFactory  
+{  
+public:  
+    PhoneFactory(){}  
+    void makeProduct()  
+    {  
+        cout<<"生产手机"<<endl;  
+    }  
+};  
+
+//专门做代工的代理工厂富士康
+class FoxconnProxy : IFactory  
+{  
+public:  
+    FoxconnProxy(IFactory* factory)  
+    {  
+        m_real = factory;  
+    }  
+    void makeProduct()  
+    {  
+        m_real->makeProduct();  
+    }  
+private:  
+    IFactory* m_real;  
+};  
+
+//客户端：
+IFactory* factory = new PhoneFactory();  
+FoxconnProxy* proxy =  new FoxconnProxy(factory);  
+proxy->makeProduct();  
+
+```
 
 ### 类中哪些函数不能为虚函数？ 
 - 构造函数:因为构造函数本来就是为了明确初始化对象成员才产生的,现在对象还没有产生，如何使用virtual函数来完成你想完成的动作
