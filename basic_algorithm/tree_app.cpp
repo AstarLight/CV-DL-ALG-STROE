@@ -1,4 +1,5 @@
 #include <iostream>
+#include <queue>
 
 using namespace std;
 
@@ -40,7 +41,7 @@ int main()
     TreeNode* pRoot;
     Bulid_BST(pRoot, key_words, num);
 
-    printf("tree all node num: %d\n",GetAllNodeNum(pRoot));
+    printf("This is a full tree: %d\n",isFullBinaryTree(pRoot));
 
 
     return 0;
@@ -137,4 +138,80 @@ int GetAllNodeNum(TreeNode* tree)
         return 0;
 
     return 1 + GetAllNodeNum(tree->left) + GetAllNodeNum(tree->right);
+}
+
+/*
+ 从根结点开始层序遍历入队列，如果队列不为空，一直循环。遇到第一个没有左孩子或者右孩子的结点，
+ 设置标记位flag=true,如果继续入队列再次遇到存在孩子的结点一定不是完全二叉树。
+ */
+bool isCompleteBinaryTree(TreeNode* tree)
+{
+    if(tree == NULL)
+        return false;
+
+    bool flag = false; //标记最后一个带孩子结点是否已经出现
+    queue<TreeNode*> q;
+    q.push(tree);
+
+    while(!q.empty())
+    {
+        TreeNode* pNode = q.front();
+        q.pop();
+
+        if(flag)
+        {
+            if(pNode->left || pNode->right)
+                return false;
+        }
+
+        //左孩子空，右孩子非空，肯定不是完全二叉树
+        if(NULL == pNode->left && pNode->right)
+        {
+            return false;
+        }
+
+        //左孩子非空，右孩子空，或者左右孩子都是空，将标记位设为true
+        if((pNode->left && pNode->right == NULL) || (pNode->left == NULL && pNode->right == NULL))
+        {
+            flag = true;
+        }
+
+        if(pNode->left)
+            q.push(pNode->left);
+        if(pNode->right)
+            q.push(pNode->right);
+    }
+
+    return true;
+}
+
+
+bool isFullBinaryTree(TreeNode* tree)
+{
+    if(tree == NULL)
+        return false;
+    
+    if(tree->left == NULL && tree->right == NULL)
+        return true;
+
+    queue<TreeNode*> q;
+    q.push(tree);
+
+    while(!q.empty())
+    {
+        TreeNode *pNode = q.front();
+        q.pop();
+
+        if(pNode->left == NULL || pNode->right == NULL)
+        {
+            return false;
+        }
+
+        if(pNode->left)
+            q.push(pNode->left);
+        if(pNode->right)
+            q.push(pNode->right);
+    }
+
+    return true;
 }
