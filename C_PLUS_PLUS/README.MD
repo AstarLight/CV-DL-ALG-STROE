@@ -491,7 +491,91 @@ public:
 
 ```
 
-### 单例模式的实现？
+### 单例模式的实现（懒汉、饿汉）？
+懒汉式：一种实现方法是定义一个单例类，使用类的私有静态指针变量指向类的唯一实例，并用一个公有的静态方法获取该实例。单例模式通过类本身来管理其唯一实例，这种特性提供了解决问题的方法。唯一的实例是类的一个普通对象，但设计这个类时，让它只能创建一个实例并提供对此实例的全局访问。唯一实例类Singleton在静态成员函数中隐藏创建实例的操作。
+```
+class CSingleton  
+{  
+private:  
+    CSingleton()   //构造函数是私有的  
+    {  
+    }  
+    static CSingleton *m_pInstance;  
+public:  
+    static CSingleton * GetInstance()  
+    {  
+        if(m_pInstance == NULL)  //判断是否第一次调用  
+            m_pInstance = new CSingleton();  
+        return m_pInstance;  
+    }  
+};  
+```
+这种实现方式存在的一个问题是m_pInstance变量的释放问题，即实例的析构问题，虽然我们可以在程序结束时主动调用GetInstance（）方法并对其返回的指针智行delete操作，但是这种方式不仅繁琐，而且调用者忘记的话，会引起很多的问题。
+
+对于上面这种问题的一种解决方法是在该类中定义一个静态全局变量，我们知道，程序在结束的时候，系统会自动析构所有的全局变量。系统也会析构所有的类的静态成员变量，就像这些静态成员也是全局变量一样。我们可以在CSingleton单例类中定义一个这样的静态成员变量，在它的析构函数中删除单例类的实例。
+```
+class CSingleton  
+{  
+private:  
+    CSingleton()  
+    {  
+    }  
+    static CSingleton *m_pInstance;  
+    class CGarbo   //它的唯一工作就是在析构函数中删除CSingleton的实例  
+    {  
+    public:  
+        ~CGarbo()  
+        {  
+            if(CSingleton::m_pInstance)  
+                delete CSingleton::m_pInstance;  
+        }  
+    };  
+    static CGarbo Garbo;  //定义一个静态成员变量，程序结束时，系统会自动调用它的析构函数  
+public:  
+    static CSingleton * GetInstance()  
+    {  
+        if(m_pInstance == NULL)  //判断是否第一次调用  
+            m_pInstance = new CSingleton();  
+        return m_pInstance;  
+    }  
+}; 
+```
+
+
+
+饿汉式:如果你对上面添加在单例类内部添加一个类静态对象的方法不是很满意，还可以使用局部静态变量方法构造：
+```
+
+class CSingleton  
+{  
+private:  
+    CSingleton()   //构造函数是私有的  
+    {  
+    }  
+public:  
+    static CSingleton & GetInstance()  
+    {  
+        static CSingleton instance;   //局部静态变量  
+        return instance;  
+    }  
+}; 
+```
+用此种方法会出现类拷贝的问题，例如 Singleton singleton = Singleton :: GetInstance();这种调用方式编译器会为类生成一个默认的构造函数，来支持类的拷贝。这样的话就违背了单例的特性，所以我们可以稍微改一下，返回的是指针：
+```
+class CSingleton  
+{  
+private:  
+    CSingleton()   //构造函数是私有的  
+    {  
+    }  
+public:  
+    static CSingleton * GetInstance()  
+    {  
+        static CSingleton instance;   //局部静态变量  
+        return &instance;  
+    }  
+}; 
+```
 
 ### 策略模式的实现？
 当用户需要选择不同的算法或行为时，如果把这些算法或行为写在一个类里，通过判断来选择的话，这个类将变得非常复杂并且难以维护。策略模式就是构造一个抽象类，具体的算法或者行为继承这个类，让用户来选择。这样做的好处是，可以随时增加或者修改行为，即增加、修改算法或行为的类就可以了。
@@ -546,6 +630,71 @@ int main()
     return 0;  
 }  
 
+```
+
+### 什么是适配器模式？
+适配器模式将一个类的接口转换成客户希望的另外一个接口，使得原本由于接口不兼容而不能一起工作的那些类可以一起工作。举个例子，在STL中就用到了适配器模式。STL实现了一种数据结构，称为双端队列（deque），支持前后两段的插入与删除。STL实现栈和队列时，没有从头开始定义它们，而是直接使用双端队列实现的。这里双端队列就扮演了被适配类的角色。队列用到了它的后端插入，前端删除。而栈用到了它的后端插入，后端删除。假设栈和队列都是一种顺序容器，有两种操作：压入和弹出。
+
+```
+//使用复合，对象模式
+class Deque  //双端队列，被适配类
+{
+public:
+    void push_back(int x)
+    {
+        cout << "Deque push_back:" << x << endl;
+    }
+    void push_front(int x)
+    {
+        cout << "Deque push_front:" << x << endl;
+    }
+    void pop_back()
+    {
+        cout << "Deque pop_back" << endl;
+    }
+    void pop_front()
+    {
+        cout << "Deque pop_front" << endl;
+    }
+};
+
+class Sequence  //顺序类，目标类
+{
+public:
+    virtual void push(int x) = 0;
+    virtual void pop() = 0;
+};
+
+class Stack:public Sequence   //栈, 适配类
+{
+public:
+    void push(int x)
+    {
+        m_deque.push_back(x);
+    }
+    void pop()
+    {
+        m_deque.pop_back();
+    }
+private:
+    Deque m_deque;
+};
+
+class Queue:public Sequence  //队列，适配类
+{
+public:
+    void push(int x)
+    {
+        m_deque.push_back(x);
+    }
+    void pop()
+    {
+        m_deque.pop_front();
+    }
+private:
+    Deque m_deque;
+};
+//END
 ```
 
 ### 什么是代理模式？
