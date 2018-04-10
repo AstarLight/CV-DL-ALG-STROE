@@ -577,6 +577,98 @@ public:
 }; 
 ```
 
+### 怎么写出单例模式的线程安全版本？
+
+此处进行了两次m_Instance == NULL的判断，是借鉴了Java的单例模式实现时，使用的所谓的“双检锁”机制。因为进行一次加锁和解锁是需要付出对应的代价的，而进行两次判断，就可以避免多次加锁与解锁操作，同时也保证了线程安全。
+```
+#include <iostream>
+using namespace std;
+ 
+class Singleton
+{
+public:
+	static Singleton *GetInstance()
+	{
+		if (m_Instance == NULL )
+		{
+			Lock(); // C++没有直接的Lock操作，请使用其它库的Lock，比如Boost，此处仅为了说明
+			if (m_Instance == NULL )
+			{
+				m_Instance = new Singleton ();
+			}
+			UnLock(); // C++没有直接的Lock操作，请使用其它库的Lock，比如Boost，此处仅为了说明
+		}
+		return m_Instance;
+	}
+ 
+	static void DestoryInstance()
+	{
+		if (m_Instance != NULL )
+		{
+			delete m_Instance;
+			m_Instance = NULL ;
+		}
+	}
+ 
+	int GetTest()
+	{
+		return m_Test;
+	}
+ 
+private:
+	Singleton(){ m_Test = 0; }
+	static Singleton *m_Instance;
+	int m_Test;
+};
+ 
+Singleton *Singleton ::m_Instance = NULL;
+ 
+int main(int argc , char *argv [])
+{
+	Singleton *singletonObj = Singleton ::GetInstance();
+	cout<<singletonObj->GetTest()<<endl;
+	Singleton ::DestoryInstance();
+ 
+	return 0;
+}
+
+```
+
+或者这种：
+```
+#include <iostream>
+using namespace std;
+ 
+class Singleton
+{
+public:
+	static Singleton *GetInstance()
+	{
+		static Singleton m_Instance;
+		return &m_Instance;
+	}
+ 
+	int GetTest()
+	{
+		return m_Test++;
+	}
+ 
+private:
+	Singleton(){ m_Test = 10; };
+	int m_Test;
+};
+ 
+int main(int argc , char *argv [])
+{
+	Singleton *singletonObj = Singleton ::GetInstance();
+	cout<<singletonObj->GetTest()<<endl;
+ 
+	singletonObj = Singleton ::GetInstance();
+	cout<<singletonObj->GetTest()<<endl;
+}
+
+```
+
 ### 策略模式的实现？
 当用户需要选择不同的算法或行为时，如果把这些算法或行为写在一个类里，通过判断来选择的话，这个类将变得非常复杂并且难以维护。策略模式就是构造一个抽象类，具体的算法或者行为继承这个类，让用户来选择。这样做的好处是，可以随时增加或者修改行为，即增加、修改算法或行为的类就可以了。
 
