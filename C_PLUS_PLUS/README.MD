@@ -1212,7 +1212,62 @@ Dijkstra提出按各顶点与源点v间的路径长度的递增次序，生成�
 
 
 ### 微信随机红包的实现？
+```
+#include <stdio.h>
+#include <vector>
+#include <math.h>
+#include<stdlib.h>
 
+
+using namespace std;
+
+float GetRandomMoney(float total_money, int package_num);
+vector<float> AllocateRedPackage(float total_money, int package_num);
+
+int main()
+{
+    vector<float> random_packages;
+    random_packages = AllocateRedPackage(100.0, 10);
+
+    for(int i=0;i<random_packages.size();i++)
+    {
+        printf("%.1f ", random_packages[i]);
+    }
+    printf("\n");
+
+    return  0;
+}
+
+vector<float> AllocateRedPackage(float total_money, int package_num)
+{
+    vector<float> ret;
+    while(total_money && package_num)
+    {
+        float random_money = GetRandomMoney(total_money, package_num);
+        ret.push_back(random_money);
+        total_money -= random_money;
+        package_num--;
+    }
+    return ret;
+}
+
+
+float GetRandomMoney(const float total_money, const int package_num)
+{
+    if(package_num == 1)
+    {
+        return (float)round(total_money*10)/10;
+    }
+
+    float r = (float)(rand() % 10) / 10;
+    float min = 0.1;
+    float max = total_money / package_num * 2;
+    float money = r * max;
+    money = money<=min?min:money;
+    money = money * 10 / 10;
+    return money;
+}
+```
 
 ### 为什么在平均情况下快速排序比堆排序要优秀？
 简单来说，就是局部性原理。在堆排中，每一个操作都是不利于程序的局部性原理的，每次元素间的比较、数的调整等，都不是相邻或者尽可能附近的元素间的比较(堆调整每次都从堆底拿元素到堆顶然后向下进行调整），那么这就需要不断地在磁盘和内存间换入换出数据。反观快排，利用分而治之的方法，元素间的比较都在某个段内，局部性相当好哇。
@@ -1230,3 +1285,6 @@ private:
 };  
 
 ```
+
+### 最小堆的底层结构是什么？
+最小堆，是一种经过排序的完全二叉树，其中任一非终端节点的数据值均不大于其左子节点和右子节点的值。
