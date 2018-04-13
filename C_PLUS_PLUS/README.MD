@@ -887,6 +887,7 @@ void operator delete[](void* ptr) {
 //---------------------------------------------------------------
 #define new new(__FILE__,__LINE__)
 ```
+```
 g++ mem.cpp -o mem -g
 
 Valgrind --tool=memcheck --leak-check=full ./mem
