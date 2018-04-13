@@ -887,13 +887,14 @@ void operator delete[](void* ptr) {
 //---------------------------------------------------------------
 #define new new(__FILE__,__LINE__)
 ```
+
+使用工具：Linux下通过工具valgrind检测
+
 ```
 g++ mem.cpp -o mem -g
 
 Valgrind --tool=memcheck --leak-check=full ./mem
 ```
-
-使用工具：Linux下通过工具valgrind检测
 
 该工具可以检测下列与内存相关的问题 :
 
