@@ -1373,3 +1373,15 @@ private:
 - show args：查看设置好的参数
 - info program： 来查看程序的是否在运行，进程号，被暂停的原因。
 
+### 怎么调试coredump？
+gdb调试coredump文件
+```
+ulimit -c unlimited  
+ulimit –c
+
+
+gdb mem core
+
+backtrace/bt
+
+```
