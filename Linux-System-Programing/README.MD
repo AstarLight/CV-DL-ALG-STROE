@@ -1262,6 +1262,7 @@ UDP:
 ### Linux查看一个100G的文件该用什么命令?
 
 ### Linux用户态占用过高怎么排查?
+top 命令，回车，按下shift+p，按照cpu利用率排序，找到对应的进程，第一列是pid，拿到pid后，执行 ps -ef|grep pid 可以看到是哪个程序在跑。找到有关联的文件，kill -9 pid，rm 删除关联文件，查看crontab是否有被改动。
 
 ###  cat的原理?
 
