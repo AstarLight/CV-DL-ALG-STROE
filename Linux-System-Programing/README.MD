@@ -1239,7 +1239,7 @@ if(buflen < 0)
 ### 网络编程中，怎么建立UDP/TCP服务器和客户端？
 TCP:
 
-![](./112ac80af3bf7957e77e92c315ce9dfd,jpg)
+![](./112ac80af3bf7957e77e92c315ce9dfd.jpg)
 
 UDP:
 
