@@ -224,12 +224,14 @@ sed:
 awk:
 - awk '{print $1,$4}' log.txt(每行按空格或TAB分割，输出文本中的1、4项/列)
 - awk '{printf "%-8s %-10s\n",$1,$4}' log.txt（格式化输出）
-- awk -F, '{print $1,$2}'   log.txt（使用","分割）
+- awk -F ',' '{print $1,$2}'   log.txt（使用","分割）
 - awk -F '[ ,]'  '{print $1,$2,$5}'   log.txt（使用多个分隔符.先使用空格分割，然后对分割结果再使用","分割）
 - awk -va=1 -vb=s '{print $1,$1+a,$1b}' log.txt（设置变量）
 - awk '$1>2' log.txt（过滤第一列大于2的行）
 - awk '$1>2 && $2=="Are" {print $1,$2,$3}' log.txt（过滤第一列大于2并且第二列等于'Are'的行）
-- 
+- awk '{print $0}' (打印所有行)
+- awk -F: 'NR%2==1 {print NR,$0}' log.txt(打印奇数行)
+- awk -F: 'NR==4 {print $2+$1+$3}' a.txt  > b.txt (将过滤后的文本写入新的文件)
 
 ### http和https的区别？
 HTTPS和HTTP的区别主要如下：
