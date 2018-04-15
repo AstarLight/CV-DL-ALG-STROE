@@ -200,6 +200,11 @@ int main()
 ### sed, awk, grep的作用？
 三个超强大的命名，分别用与格式化修改，统计，和正则查找
 
+awk、sed、grep更适合的方向：
+- grep 更适合单纯的查找或匹配文本
+- sed 更适合编辑匹配到的文本
+- awk 更适合格式化文本，对文本进行较复杂格式处理
+
 记一下比较经典的操作：
 sed:
 - sed -e '1d' inputfile (删除第一行)
@@ -215,6 +220,16 @@ sed:
 - sed 's/book/books/' file (替换文本中book为books)
 - sed -i 's/book/books/g' file （全局替换：换文本中book为books）
 - sed -i 's/sk/SK/2g' file（从第2个匹配时开始替换）
+
+awk:
+- awk '{print $1,$4}' log.txt(每行按空格或TAB分割，输出文本中的1、4项/列)
+- awk '{printf "%-8s %-10s\n",$1,$4}' log.txt（格式化输出）
+- awk -F, '{print $1,$2}'   log.txt（使用","分割）
+- awk -F '[ ,]'  '{print $1,$2,$5}'   log.txt（使用多个分隔符.先使用空格分割，然后对分割结果再使用","分割）
+- awk -va=1 -vb=s '{print $1,$1+a,$1b}' log.txt（设置变量）
+- awk '$1>2' log.txt（过滤第一列大于2的行）
+- awk '$1>2 && $2=="Are" {print $1,$2,$3}' log.txt（过滤第一列大于2并且第二列等于'Are'的行）
+- 
 
 ### http和https的区别？
 HTTPS和HTTP的区别主要如下：
