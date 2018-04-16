@@ -1385,3 +1385,13 @@ gdb mem core
 backtrace/bt
 
 ```
+### BST相关的复杂度？
+BST的：
+- 插入：O(logn)
+- 建树：O(nlogn)
+- 查找：O(logn) / O(n)
+- 删除：O(logn)
+
+AVL:
+- 旋转：O(1)
+- 高度更新:O(1)
