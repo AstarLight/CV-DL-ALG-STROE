@@ -235,6 +235,24 @@ awk:
 - awk '{print NR,NF,$1,$NF,}' file （ 显示文件file的当前记录号、域数和每一行的第一个和最后一个域）
 - awk  -v sum=0 '{if(NR==2){for(i=1;i<=NF;i++) sum+=$i; print sum;}}' a.txt (输出文本第二行所有元素相加的结果)
 
+
+grep:
+- grep linuxtechi /etc/passwd /etc/shadow /etc/gshadow (在多个文件中查找模式)
+- grep -l linuxtechi /etc/passwd /etc/shadow /etc/fstab /etc/mtab (使用-L参数列出包含指定模式的文件的文件名)
+- grep -n linuxtechi /etc/passwd (使用-N参数，在文件中查找指定模式并显示匹配行的行号)
+- grep -v linuxtechi /etc/passwd (使用-V参数输出不包含指定模式的行)
+- grep ^root /etc/passwd (使用 ^ 符号输出所有以某指定模式开头的行)
+- grep bash$ /etc/passwd (使用 $ 符号输出所有以指定模式结尾的行)
+- grep -i LinuxTechi /etc/passwd (-i参数在查找时忽略字符的大小写)
+- grep -c  grep_pattern /etc/passwd (使用 -C 参数计算模式匹配到的数量)
+- grep -A 4"games" /etc/passwd (输出匹配指定模式行的前或者后面N行:-A 前 -B后 -C 前后)
+- echo "redh" |grep "[e]" （匹配指定范围内的任意字符 [e] 匹配任意单个字符）
+- echo "redh" |grep "[a-d]" （匹配指定范围内的任意字符 [a-z],[1-3a-b] [1-3a-bX-Z]）
+- echo "16" |grep "[1-9a-z]"
+- echo "a" |grep "[^1-3a-b]" （匹配非[1-3],非[a-b]的）
+- echo "zredhat"|grep "\(re\)\(d\+\)" （匹配red,redd,reddd,redddd,...）
+- echo "d"|grep "\(re\)\|\(d\+\)" （匹配re 或者d,dd,ddd..）
+
 ### http和https的区别？
 HTTPS和HTTP的区别主要如下：
 
