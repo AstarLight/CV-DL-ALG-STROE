@@ -233,7 +233,7 @@ awk:
 - awk -F: 'NR%2==1 {print NR,$0}' log.txt(打印奇数行)
 - awk -F: 'NR==4 {print $2+$1+$3}' a.txt  > b.txt (将过滤后的文本写入新的文件)
 - awk '{print NR,NF,$1,$NF,}' file （ 显示文件file的当前记录号、域数和每一行的第一个和最后一个域）
-- |awk '{for(i=1;i<=NF;i++){print $i}}'
+- awk  -v sum=0 '{if(NR==2){for(i=1;i<=NF;i++) sum+=$i; print sum;}}' a.txt (输出文本第二行所有元素相加的结果)
 
 ### http和https的区别？
 HTTPS和HTTP的区别主要如下：
