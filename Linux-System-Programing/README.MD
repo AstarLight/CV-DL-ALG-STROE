@@ -252,10 +252,10 @@ grep:
 - echo "a" |grep "[^1-3a-b]" （匹配非[1-3],非[a-b]的）
 
 
-'''
+```
 echo "d"|grep "\(re\)\|\(d\+\)"  （匹配red,redd,reddd,redddd,...）
 echo "zredhat"|grep "\(re\)\(d\+\)"  （匹配red,redd,reddd,redddd,...）
-'''
+```
 
 ### http和https的区别？
 HTTPS和HTTP的区别主要如下：
