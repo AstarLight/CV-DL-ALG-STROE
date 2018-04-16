@@ -250,8 +250,12 @@ grep:
 - echo "redh" |grep "[a-d]" （匹配指定范围内的任意字符 [a-z],[1-3a-b] [1-3a-bX-Z]）
 - echo "16" |grep "[1-9a-z]"
 - echo "a" |grep "[^1-3a-b]" （匹配非[1-3],非[a-b]的）
-- echo "zredhat"|grep "\(re\)\(d\+\)" （匹配red,redd,reddd,redddd,...）
-- echo "d"|grep "\(re\)\|\(d\+\)" （匹配re 或者d,dd,ddd..）
+
+
+'''
+echo "d"|grep "\(re\)\|\(d\+\)"  （匹配red,redd,reddd,redddd,...）
+echo "zredhat"|grep "\(re\)\(d\+\)"  （匹配red,redd,reddd,redddd,...）
+'''
 
 ### http和https的区别？
 HTTPS和HTTP的区别主要如下：
