@@ -1398,3 +1398,35 @@ BST的：
 AVL:
 - 旋转：O(1)
 - 高度更新:O(1)
+
+### STL map遍历时的顺序是什么？怎么改变该顺序？
+排序问题，STL中默认是采用小于号来排序的，因为设置int等类型做key，它本身支持小于号运算（底层红黑树，从BST理解）。用string类型作为key，我们的存储就是按学生姓名的字典排序储存的。
+
+map这里指定less作为其默认比较函数(对象)，所以我们通常如果不自己指定Compare，map中键值对就会按照Key的less顺序进行组织存储，因此我们就看到了上面代码输出结果是按照学生姓名的字典顺序输出的，即string的less序列。
+
+我们可以在定义map的时候，指定它的第三个参数Compare，比如我们把默认的less指定为greater。或者自己重写compare函数
+```
+struct CmpByKeyLength {  
+  bool operator()(const string& k1, const string& k2) {  
+    return k1.length() < k2.length();  
+  }  
+};  
+
+
+
+int main() {  
+  map<string, int, CmpByKeyLength> name_score_map;  
+  name_score_map["LiMin"] = 90;   
+  name_score_map["ZiLinMi"] = 79;   
+  name_score_map["BoB"] = 92;   
+  name_score_map.insert(make_pair("Bing",99));  
+  name_score_map.insert(make_pair("Albert",86));  
+  for (map<string, int>::iterator iter = name_score_map.begin();  
+       iter != name_score_map.end();  
+       ++iter) {  
+    cout << *iter << endl;  
+  }  
+  return 0;  
+}
+
+```
