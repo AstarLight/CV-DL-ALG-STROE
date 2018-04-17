@@ -105,8 +105,47 @@ int main() {
 ### C++四种类型转换(cast)
 1. static_cast
 最常用的类型转换符，在正常状况下的类型转换，如把int转换为float，如：int i；float f； f=（float）i；或者f=static_cast<float>(i)
+```
+char a = 'a';
+int b = static_cast<char>(a);//正确，将char型数据转换成int型数据
+
+double *c = new double;
+void *d = static_cast<void*>(c);//正确，将double指针转换成void指针
+
+int e = 10;
+const int f = static_cast<const int>(e);//正确，将int型数据转换成const int型数据
+
+const int g = 20;
+int *h = static_cast<int*>(&g);//编译错误，static_cast不能转换掉g的const属性
+
+
+if(Derived *dp = static_cast<Derived *>(bp)){//下行转换是不安全的
+  //使用dp指向的Derived对象  
+}
+else{
+  //使用bp指向的Base对象  
+}
+
+if(Base*bp = static_cast<Derived *>(dp)){//上行转换是安全的
+  //使用bp指向的Derived对象  
+}
+else{
+  //使用dp指向的Base对象  
+}
+```
 2. const_cast
 用于取出const属性，把const类型的指针变为非const类型的指针，如：const int *fun(int x,int y){}　　int *ptr=const_cast<int *>(fun(2.3))
+```
+const int g = 20;
+int *h = const_cast<int*>(&g);//去掉const常量const属性
+
+const int g = 20;
+int &h = const_cast<int &>(g);//去掉const引用const属性
+
+ const char *g = "hello";
+char *h = const_cast<char *>(g);//去掉const指针const属性
+
+```
 3. dynamic_cast
     
   dynamic_cast <type-id> (expression),运算符把expression转换成type-id类型的对象。Type-id 必须是类的指针、类的引用或者void*；
@@ -115,23 +154,24 @@ int main() {
 - dynamic_cast转换如果成功的话返回的是指向类的指针或引用，指针转换失败的话则会返回NULL，引用转换失败抛出异常。
 - 使用dynamic_cast进行转换的，基类中一定要有虚函数，否则编译不通过
 
-```
-struct B1{
-    virtual ~B1(){}
-};
-struct B2{
-    virtual ~B2(){}
-};
-struct D1 : B1, B2{};
-int main()
-{
-    D1 d;
-    B1* pb1 = &d;
-    B2* pb2 = dynamic_cast<B2*>(pb1);//L1
-    B2* pb22 = static_cast<B2*>(pb1);  //L2
-    return 0;
+if(Derived *dp = dynamic_cast<Derived *>(bp)){
+  //使用dp指向的Derived对象  
+}
+else{
+  //使用bp指向的Base对象  
 }
 
+//因为不存在所谓空引用，所以引用类型的dynamic_cast转换与指针类型不同，在引用转换失败时，会抛出std::bad_cast异常，该异常定义在头文件typeinfo中。
+
+void f(const Base &b){
+ try{
+   const Derived &d = dynamic_cast<const Base &>(b);  
+   //使用b引用的Derived对象
+ }
+ catch(std::bad_cast){
+   //处理类型转换失败的情况
+ }
+}
 
 ```
 从上述定义中可以看到,B1和B2是不相关的类,从L1可以看到,dynamic_cast允许这种转换:只要B1存在多态方法.
@@ -139,7 +179,9 @@ L2将编译失败,static_cast并不允许两个完全不相干的类互相转换
 
 4.reinterpret_cast
 
+
 interpret是解释的意思，reinterpret即为重新解释，此标识符的意思即为数据的二进制形式重新解释，但是不改变其值。如：int i; char *ptr="hello freind!"; i=reinterpret_cast<int>(ptr);这个转换方式很少使用。
+
 
 ### static_cast与dynamic_cast用法的异同？
 static_cast < type-id > ( exdivssion ) 
