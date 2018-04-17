@@ -1376,3 +1376,29 @@ top 命令，回车，按下shift+p，按照cpu利用率排序，找到对应的
 
 ### 怎么理解页面置换过程中的抖动现象？
 抖动现象就是刚刚换出的页面又要换入内存，刚刚换入内存的页面又要换出内存。发生抖动现象的原因是：某个进程频繁访问的页面数目高于可用的物理页帧数目。
+
+
+### Unix Domain Socket是干什么用的？
+
+socket API原本是为网络通讯设计的，但后来在socket的框架上发展出一种IPC机制，就是UNIX Domain Socket。虽然网络socket也可用于同一台主机的进程间通讯（通过loopback地址127.0.0.1），但是UNIX Domain Socket用于IPC更有效率：不需要经过网络协议栈，不需要打包拆包、计算校验和、维护序号和应答等，只是将应用层数据从一个进程拷贝到另一个进程。这是因为，IPC机制本质上是可靠的通讯，而网络协议是为不可靠的通讯设计的。UNIX Domain Socket也提供面向流和面向数据包两种API接口，类似于TCP和UDP，但是面向消息的UNIX Domain Socket也是可靠的，消息既不会丢失也不会顺序错乱。
+
+Unix domain socket 使用系统文件的地址来作为自己的身份。它可以被系统进程引用。所以两个进程可以同时打开一个Unix domain sockets来进行通信。不过这种通信方式是发生在系统内核里而不会在网络里传播。
+
+UNIX Domain Socket是全双工的，API接口语义丰富，相比其它IPC机制有明显的优越性，目前已成为使用最广泛的IPC机制，比如X Window服务器和GUI程序之间就是通过UNIXDomain Socket通讯的
+
+如果熟悉Socket的话,UDS也是同样的方式, 区别如下:
+
+1. UDS不需要IP和Port, 而是通过一个文件名来表示
+2. domain 为 AF_UNIX
+3. UDS中使用sockaddr_un表示
+
+```
+//API定义是一样的，不过这里的第一个参数，也就是域一定要设置成AF_UNIX或AF_LOCAL，而不是普通TCP/IP套接字的AF_INET。
+Socket(AF_UNIX, SOCK_STREAM, 0);
+
+//结构体中的第一个字段必须要设置成“AF_UNIX”。而第二个字段，表示的是一个路径名。因此，要将一个Unix域套接字绑定到一个本地地址上(一个文件路径)，需要创建并初始化一//个sockaddr_un结构体，并将指向这个结构体的指针作为addr参数（需要类型转换）传入bind()函数，并将addrlen参数设置成这个结构体的实际大小。
+struct sockaddr_un {  
+sa_family_t sun_family;  
+char sun_path[108];  
+}  
+```
