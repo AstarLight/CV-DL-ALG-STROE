@@ -105,6 +105,7 @@ int main() {
 ### C++四种类型转换(cast)
 1. static_cast
 最常用的类型转换符，在正常状况下的类型转换，如把int转换为float，如：int i；float f； f=（float）i；或者f=static_cast<float>(i)
+	
 ```
 char a = 'a';
 int b = static_cast<char>(a);//正确，将char型数据转换成int型数据
@@ -153,7 +154,7 @@ char *h = const_cast<char *>(g);//去掉const指针const属性
 - 不能用于内置的基本数据类型的强制转换
 - dynamic_cast转换如果成功的话返回的是指向类的指针或引用，指针转换失败的话则会返回NULL，引用转换失败抛出异常。
 - 使用dynamic_cast进行转换的，基类中一定要有虚函数，否则编译不通过
-
+```
 if(Derived *dp = dynamic_cast<Derived *>(bp)){
   //使用dp指向的Derived对象  
 }
