@@ -104,7 +104,7 @@ int main() {
 
 ### C++四种类型转换(cast)
 1. static_cast
-最常用的类型转换符，在正常状况下的类型转换，如把int转换为float，如：int i；float f； f=（float）i；或者f=static_cast<float>(i)
+最常用的类型转换符，在正常状况下的类型转换
 	
 ```
 char a = 'a';
@@ -181,7 +181,7 @@ L2将编译失败,static_cast并不允许两个完全不相干的类互相转换
 4.reinterpret_cast
 
 
-interpret是解释的意思，reinterpret即为重新解释，此标识符的意思即为数据的二进制形式重新解释，但是不改变其值。如：int i; char *ptr="hello freind!"; i=reinterpret_cast<int>(ptr);这个转换方式很少使用。
+interpret是解释的意思，reinterpret即为重新解释，此标识符的意思即为数据的二进制形式重新解释，但是不改变其值。允许将任何指针转换为任何其他指针类型,比如不同类的对象指针可以互相转换。 也允许将任何整数类型转换为任何指针类型以及反向转换。.如：int i; char *ptr="hello freind!"; i=reinterpret_cast<int>(ptr);这个转换方式很少使用。
 
 
 ### static_cast与dynamic_cast用法的异同？
