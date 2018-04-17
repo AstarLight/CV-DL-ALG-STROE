@@ -1402,3 +1402,17 @@ sa_family_t sun_family;
 char sun_path[108];  
 }  
 ```
+### raw socket有什么用？
+raw socket的用途：主要有三个方面
+
+1. 通过raw socket来接收发向本机的ICMP,IGMP协议包,或者用来发送这些协议包.
+2. 接收发向本机但TCP/IP栈不能够处理的IP包：现在许多操作系统在实现网络部分的时候,通常只实现了常用的几种协议,如tcp,udp,icmp等,但象其它的如ospf,ggp等协议,操作系统往往没有实现,如果自己有必要编写位于其上的应用,就必须借助raw socket来实现,这是因为操作系统遇到自己不能够处理的数据包(ip头中的protocol所指定的上层协议不能处理)就将这个包交给协议对应的raw socket.
+3. 用来发送一些自己制定源地址等特殊作用的IP包(自己写IP头,TCP头等等)，因为内核不能识别的协议、格式等将传给原始套接字，因此，可以使用原始套接字定义用户自己的协议格式
+
+```
+//网络层socket - 网络层 raw socket
+//建立方式如下:
+
+socket(AF_INET, SOCK_RAW, IPPROTO_UDP );//三层socket,第三个参数可以是UDP,TCP或者ICMP 
+sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_IP));//二层socket,第三个参数可以为ETH_P_ALL ETH_P_IP ETH_P_ARP等
+```
