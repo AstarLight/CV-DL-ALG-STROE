@@ -1416,3 +1416,19 @@ raw socket的用途：主要有三个方面
 socket(AF_INET, SOCK_RAW, IPPROTO_UDP );//三层socket,第三个参数可以是UDP,TCP或者ICMP 
 sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_IP));//二层socket,第三个参数可以为ETH_P_ALL ETH_P_IP ETH_P_ARP等
 ```
+### git的常用指令有哪些？
+```
+git init //建立一个仓库
+git init newrepo  //使用我们指定目录作为Git仓库
+git add filename //使用add命令添加文件
+git commit -m "Adding files"  //提交版本
+git clone ssh://example.com/~/www/project.git  //从服务器克隆一个库并上传
+git push ssh://example.com/~/www/project.git //修改之后可以进行推送到服务器
+git pull //当前分支自动与唯一一个追踪分支进行合并
+git rm file //从资源库中删除文件
+git branch test //要创建一个新的分支
+git checkout test  //branch命令不会将我们带入分支，只是创建一个新分支。所以我们使用checkout命令来更改分支。
+git checkout master //对其他分支的更改不会反映在主分支上。如果想将更改提交到主分支，则需切换回master分支，然后使用合并。
+git merge test
+git branch -d test  //删除分支，我们使用-d标识
+```
