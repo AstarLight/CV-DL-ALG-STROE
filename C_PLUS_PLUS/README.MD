@@ -1500,3 +1500,5 @@ int main() {
 }
 
 ```
+### STL的组成部分有哪些？
+STL可分为容器(containers)、迭代器(iterators)、空间配置器(allocator)、配接器(adapters)、算法(algorithms)、仿函数(functors)六个部分。
