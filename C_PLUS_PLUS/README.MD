@@ -1502,3 +1502,11 @@ int main() {
 ```
 ### STL的组成部分有哪些？
 STL可分为容器(containers)、迭代器(iterators)、空间配置器(allocator)、配接器(adapters)、算法(algorithms)、仿函数(functors)六个部分。
+
+### 循环队列中怎么判断队列满？
+一般而言，front指向当前元素，rear指向当前元素的后一个元素。循环队列会空一个单位。
+- 求队列长度 （r-f+maxsize）%maxsize.
+- 队列空 r == f
+- 队列满 (r+1)%maxsize == f
+- 入队 (r+1)%maxsize
+- 出队(f+1)%maxsize
