@@ -1524,3 +1524,7 @@ Linux内核通过伙伴算法来管理物理内存。伙伴系统（Buddy System
 
 ### 怎么理解TLB？
 
+### Linux的.a、.so和.o文件分别代表什么？
+- .o,是目标文件,相当于windows中的.obj文件 
+- .so 为共享库,是shared object,用于动态连接的,相当于windows下的dll 
+- .a为静态库,是好多个.o合在一起,用于静态连接 
