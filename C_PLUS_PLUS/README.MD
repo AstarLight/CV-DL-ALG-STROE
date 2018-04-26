@@ -1552,7 +1552,7 @@ STL可分为容器(containers)、迭代器(iterators)、空间配置器(allocato
 
 
 ### vector和list中插入操作谁效率更高？
-看你怎么插往前后插，那用deque往后插，用vector往中间插或者插了要频繁的删除，用list还有数据如果是需要按照值查找，那建议用map或者set这又分为两种，一种是用红黑树实现(nlgn时间复杂度），一种用哈希表实现（理论上是常量时间复杂度，但是空间复杂度高）。如果数据的key可重复，建议用multimap。或者muliset
+看你怎么插往前后插，那用deque;往后插，用vector;往中间插或者插了要频繁的删除，用list;还有数据如果是需要按照值查找，那建议用map或者set;这又分为两种，一种是用红黑树实现(nlgn时间复杂度），一种用哈希表实现（理论上是常量时间复杂度，但是空间复杂度高）。如果数据的key可重复，建议用multimap。或者muliset
 
 
 - 迭代器遍历，list 比vector 稍块，使用for_each 比使用for更快。
