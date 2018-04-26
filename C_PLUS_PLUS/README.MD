@@ -31,6 +31,40 @@ int main() {
     return 0;
 }
 ```
+
+定义了一个非虚成员函数，sizeof(a)还是1，表明函数指针不存储在对象空间中
+```
+#include <iostream>
+#include <stdio.h>
+
+class A
+{
+	void foo() {}
+};
+
+int main() {
+	A a;
+	printf("sizeof(A) = %d\n", sizeof(a));  // sizeof(A) = 1
+	return 0;
+}
+```
+定义一个虚函数，sizeof(a) = 4，存了个虚函数表指针
+```
+#include <iostream>
+#include <stdio.h>
+
+class A
+{
+	virtual void foo() {}
+};
+
+int main() {
+	A a;
+	printf("sizeof(A) = %d\n", sizeof(a));  // sizeof(A) = 4
+	return 0;
+}
+```
+
 ### 析构函数什么情况下定义为虚函数？
 当你用一个基类指针指向一个动态创建的派生类对象的时候，如果你想delete这个派生类对象，就必须把基类的析构函数写成虚函数，这样就可以调用派生类的析构函数delete掉这个对象了。否则会内存泄露。
 
