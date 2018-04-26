@@ -1116,3 +1116,48 @@ STL内存分配分为一级分配器和二级分配器，一级分配器就是�
 
 ### 全局变量和static变量的区别？
 1) 全局变量(外部变量)的说明之前再冠以static 就构成了静态的全局变量。全局变量本身就是静态存储方式， 静态全局变量当然也是静态存储方式。 这两者在存储方式上并无不同。这两者的区别在于非静态全局变量的作用域是整个源程序， 当一个源程序由多个源文件组成时，非静态的全局变量在各个源文件中都是有效的。 而静态全局变量则限制了其作用域， 即只在定义该变量的源文件内有效， 在同一源程序的其它源文件中不能使用它。由于静态全局变量的作用域局限于一个源文件内，只能为该源文件内的函数公用， 因此
+
+### 怎么对基类的成员变量做初始化？
+```
+#include <stdio.h>
+
+class A
+{
+public:
+	virtual void foo() 
+	{
+		printf("base foo!\n");
+	}
+	A(int x, int y) :a(x), b(y)
+	{
+
+	}
+private:
+	int a;
+	int b;
+};
+
+class B : public A
+{
+public:
+	virtual void foo()
+	{
+		printf("derived foo!\n");
+	}
+	B(int x, int y, int z) :A(x, y), c(z)
+	{
+
+	}
+private:
+	int c;
+};
+
+int main()
+{
+
+	A* pA = new B(1,2,3);
+	pA->A::foo();
+
+	return 0;
+}
+```
