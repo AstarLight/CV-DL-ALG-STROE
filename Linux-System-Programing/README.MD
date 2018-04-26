@@ -1528,3 +1528,20 @@ Linux内核通过伙伴算法来管理物理内存。伙伴系统（Buddy System
 - .o,是目标文件,相当于windows中的.obj文件 
 - .so 为共享库,是shared object,用于动态连接的,相当于windows下的dll 
 - .a为静态库,是好多个.o合在一起,用于静态连接 
+
+### Linux下的打包压缩怎么做？
+打包是指将一大堆文件或目录变成一个总的文件；压缩则是将一个大的文件通过一些压缩算法变成一个小文件。
+
+- 解包：tar xvf FileName.tar
+- 打包：tar cvf FileName.tar DirName
+- 解压1：gunzip FileName.gz
+- 解压2：gzip -d FileName.gz
+- 解压：tar zxvf FileName.tar.gz
+- 压缩：tar zcvf FileName.tar.gz DirName
+- 解压：unzip FileName.zip
+- 压缩：zip FileName.zip DirName
+- 解压：rar x FileName.rar
+- 压缩：rar a FileName.rar DirName 
+
+
+
