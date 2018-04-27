@@ -1651,3 +1651,23 @@ int main()
 有两种方式可以不使用中间变量，交换同类型的变量a,b的值：
 1. 使用加法操作a+=b; b=a-b;a -= b;
 2. 使用异或操作：a^=b;b^=a;a^=b;
+
+### C++类的默认函数有几个？分别是什么？
+```
+//定义一个空的C++类，例如
+class Empty
+{
+}
+//一个空的class在C++编译器处理过后就不再为空，编译器会自动地为我们声明一些member function，一般编译过去就相当于
+class Empty
+{
+public:
+    Empty(); // 缺省构造函数
+    Empty( const Empty& ); // 拷贝构造函数
+    ~Empty(); // 析构函数
+    Empty& operator=( const Empty& ); // 赋值运算符
+    Empty* operator&(); // 取址运算符
+    const Empty* operator&() const; // 取址运算符 const
+};
+```
+如果你只是声明一个空类，不做任何事情的话，编译器会自动为你生成一个默认构造函数、一个拷贝默认构造函数、一个默认拷贝赋值操作符和一个默认析构函数。这些函数只有在第一次被调用时，才会别编译器创建。所有这些函数都是inline和public的。
