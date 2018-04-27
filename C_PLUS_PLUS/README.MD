@@ -1671,3 +1671,49 @@ public:
 };
 ```
 如果你只是声明一个空类，不做任何事情的话，编译器会自动为你生成一个默认构造函数、一个拷贝默认构造函数、一个默认拷贝赋值操作符和一个默认析构函数。这些函数只有在第一次被调用时，才会别编译器创建。所有这些函数都是inline和public的。
+
+### 友元关系能继承吗？
+不能被继承。
+
+友元能够是个函数，该函数被称为友元函数；友元也能够是个类，该类被称为友元类。
+在C++中，自定义函数可以充当友元，友元只是能访问指定类的私有和保护成员的自定义函数，不是被指定类的成员，自然不能继承。
+使用友元类时注意：
+- 友元关系不能被继承。 
+- 友元关系是单向的，不具有交换性。若类B是类A的友元，类A不一定是类B的友元，要看在类中是否有相应的声明。
+- 友元关系不具有传递性。若类B是类A的友元，类C是B的友元，类C不一定是类A的友元，同样要看类中是否有相应的申明
+```
+class Base
+{
+    friend class frnd;
+protected:
+    int i;
+}
+
+// Frnd has no access to members in D1
+class D1 : public Base
+{
+protected:
+    int j;
+};
+
+class Frnd
+{
+public:
+    int mem(Base b) { return b.i; } // ok: Frnd is friend to Base
+    int mem(D1 d) { return d.i; } // error: friendship doesn’t inherit
+};
+
+// D2 has no access to members in Base
+class D2 : public Frnd
+{
+public:
+    int mem(Base b) { return b.i; } // error: friendship doesn’t inherit
+};
+```
+
+注意事项：
+1. 友元可以访问类的私有成员。
+2. 只能出现在类定义内部，友元声明可以在类中的任何地方，一般放在类定义的开始或结尾。
+3. 友元可以是普通的非成员函数，或前面定义的其他类的成员函数，或整个类。
+4. 类必须将重载函数集中每一个希望设为友元的函数都声明为友元。
+5. 友元关系不能继承，基类的友元对派生类的成员没有特殊的访问权限。如果基类被授予友元关系，则只有基类具有特殊的访问权限。该基类的派生类不能访问授予友元关系的类。
