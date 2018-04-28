@@ -1782,3 +1782,21 @@ int main()
 3. 静态成员变量使用前必须先初始化(如int MyClass::m_nNumber = 0;)，否则会在linker时出错。
 
 ４. 静态类成员函数可以直接在类内声明＋定义(static void foo() {})，也可以在类内声明(static void foo();)，然后在类外实现void A::foo() {}　（注意不加static）
+
+针对1，其实我们可以通过一些手段来实现静态函数访问非静态成员。有一个很取巧的办法，就是在静态函数的形参表里加上实例的地址,我们调用　静态函数时传入对象的指针即可。
+```
+class A
+{
+public:
+    static void test(A *a)
+    {
+        a->m_a += 1;
+    }
+    void hello()
+    {
+    }
+private:
+    static int m_staticA;
+    int m_a
+};
+```
