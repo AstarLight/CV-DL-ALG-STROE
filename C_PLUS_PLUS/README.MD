@@ -1800,3 +1800,62 @@ private:
     int m_a
 };
 ```
+
+### 深拷贝和浅拷贝的区别？
+所谓浅拷贝，指的是在对象复制时，只对对象中的数据成员进行简单的赋值，默认拷贝构造函数执行的也是浅拷贝。在“深拷贝”的情况下，对于对象中动态成员，就不能仅仅简单地赋值了，而应该重新动态分配空间
+
+如果一个类拥有资源，当这个类的对象发生复制过程的时候，资源重新分配，这个过程就是深拷贝
+
+### 什么时候发生拷贝构造，什么时候发生赋值？
+```
+#include <iostream>
+
+using namespace std;
+
+class Person
+{
+public:
+     Person(){}
+     Person(const Person& p)
+     {
+        cout << "Copy Constructor" << endl;
+     }
+     Person& operator=(const Person& p)
+     {
+         cout << "Assign" << endl;
+         return *this;
+     }
+private:
+    int age;
+    string name;
+};
+void f(Person p)
+{
+    return;
+}
+Person f1()
+{
+    Person p;
+    return p;
+}
+Person f2()
+{
+    static Person p;
+    return p;
+}
+
+
+int main()
+{
+    Person p;
+    //Person p1 = p; // 拷贝构造
+    Person p2;
+    //p2 = p; // 赋值
+    //f(p2); // 拷贝构造
+    //p2 = f1(); // 赋值
+    Person p3 = f1(); //啥都不是，错误做法，返回临时变量无法调用拷贝构造生成新对象
+    //Person p4 = f2();  //拷贝构造
+    //p2 = f2(); //拷贝构造＋赋值，拷贝构造发生在return时会构造一个暂时的副本用于返回
+    return 0;
+}
+```
