@@ -1877,3 +1877,62 @@ void main()
     A a1 = g();//匿名对象直接去初始化a1，不会调用copy构造函数（此时c++编译器直接把匿名对象转成a1）。不是赋值也不是拷贝构造。
 }
 ```
+### 什么叫NRV优化?
+```
+class TextFile {
+public:
+	TextFile() {};
+	TextFile(const TextFile& tf) {
+		cout << "copy" << endl;
+	};
+	TextFile& operator=(TextFile& tf) {
+		cout << "operator=" << endl;
+		return *this;
+	};
+};
+
+TextFile get_tmp_text_file() {
+	TextFile tf;
+	return tf;
+}
+
+int main() {
+
+	TextFile tf = get_tmp_text_file();
+}
+
+```
+这是很经典的例子，很多文章都会讲 TextFile tf = get_tmp_text_file(); 会调用两次拷贝构造函数，一次是 get_tmp_text_file 函数返回时，将函数返回拷贝到临时变量里，第二次是在 main 函数内构造 TextFile 对象时，将临时变量拷贝到 tf 对象上。所以，程序会输出两遍 copy。
+
+然而，如果你现在写了这么一个程序，真的跑一遍，它什么都不会输出。
+
+不要怀疑自己，代码没错，教程也没错，这是因为GCC的 返回值优化 。
+
+当一个函数返回一个对象实例，一个临时对象将被创建并通过复制构造函数把目标对象复制给这个临时对象。C++标准允许省略这些复制构造函数，即使这导致程序的不同行为，即使编译器把两个对象视作同一个具有副作用。
+
+这是C++标准允许编译器独立实现的优化。被称为返回值优化（RVO/NRVO）。
+
+G++编译时，会默认对代码进行返回值优化，优化后的等价代码如下：
+
+```
+TextFile get_tmp_text_file(TextFile * tf) {
+	// 直接在tf上构造
+}
+
+int main() {
+    TextFile tf;
+	get_tmp_text_file(&tf);
+}
+
+```
+因此就不需要再调用 TextFile 对象的拷贝构造函数。
+
+要关闭这种优化，只要在编译时加上 -fno-elide-constructors 强制G++总是使用拷贝构造函数。
+```
+g++ 2DimensionArray.cpp -o run -fno-elide-constructors && ./run
+
+输出：
+copy
+copy
+```
+
