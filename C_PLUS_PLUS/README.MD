@@ -1936,3 +1936,72 @@ copy
 copy
 ```
 
+### C++继承中重载、重写的区别？
+重载overload：是函数名相同，参数列表不同 重载只是在类的内部存在。但是不能靠返回类型来判断。
+
+重写override：也叫做覆盖。子类重新定义父类中有相同名称和参数的虚函数。函数特征相同。但是具体实现不同，主要是在继承关系中出现的 。
+
+重定义 (redefining)也叫做隐藏:子类重新定义父类中有相同名称的非虚函数 ( 参数列表可以不同 ) 。
+
+
+1. 成员函数重载特征：
+- 相同的范围（在同一个类中）
+- 函数名字相同
+- 参数不同
+- virtual关键字可有可无
+
+2. 重写（覆盖)是指派生类函数覆盖基类函数，特征是：
+- 不同的范围，分别位于基类和派生类中
+- 函数的名字相同
+- 参数相同
+- 基类函数必须有virtual关键字
+
+3. 重定义(隐藏)是指派生类的函数屏蔽了与其同名的基类函数，规则如下：
+- 如果派生类的函数和基类的函数同名，但是参数不同，此时，不管有无virtual，基类的函数被隐藏。
+- 如果派生类的函数与基类的函数同名，并且参数也相同，但是基类函数没有vitual关键字，此时，基类的函数被隐藏。
+
+```
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+class Base {
+private:
+    virtual void display() { cout << "Base display()" << endl; }
+    void say(){ cout << "Base say()" << endl; }
+public:
+    void exec(){ display(); say(); }
+    void f1(string a) { cout << "Base f1(string)" << endl; }
+    void f1(int a) { cout << "Base f1(int)" << endl; } //overload，两个f1函数在Base类的内部被重载
+};
+
+class DeriveA :public Base{
+public:
+    void display() { cout << "DeriveA display()" << endl; } //override，基类中display为虚函数，故此处为重写
+    void f1(int a, int b) { cout << "DeriveA f1(int,int)" << endl; } //redefining，f1函数在Base类中不为虚函数，故此处为重定义
+    void say() { cout << "DeriveA say()" << endl; } //redefining，同上
+};
+
+
+class DeriveB :public Base
+{
+public:
+    void f1(int a) { cout << "DeriveB f1(int)" << endl; } //redefining，重定义
+};
+
+
+int main(){
+    DeriveA a;
+    Base *b = &a;
+    b->exec(); //display():version of DeriveA call(polymorphism) //say():version of Base called(allways )
+
+    //b里边的函数display被A类覆盖，但是say还是自己的。
+
+    a.exec(); //same result as last statement   
+    a.say();
+    DeriveB c;
+    c.f1(1); //version of DeriveB called
+}
+
+```
