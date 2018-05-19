@@ -2,7 +2,7 @@
 思路一：先遍历顺序复制链表，并记录<原始节点addr，新链表节点的addr>的映射关系。第二次遍历时
 对新链表节点的random指针通过查阅map进行赋值,时间复杂度O(N)，空间复杂度O(n)
 
-思路二：对原来链表的每个节点进行复制，并将复制节点连接在当前节点之后，最后再将这个链表拆分成
+思路二：对原来链表的每个节点进行复制，并将复制节点连接在当前节点之后，第二次遍历更新新加节点的random指针。最后再将这个链表拆分成
 两个链表，时间复杂度O(n)，空间复杂度O(1)
 */
 
@@ -68,26 +68,26 @@ public:
             p = node->next;
         }
         
-        RandomListNode* pClone = pHead->next;
         p = pHead;
-        while(p && pClone)
+        while(p)
         {
-            pClone->random = p->random->next;
-            p->next = pClone->next;
-            p = p->next;
-            pClone->next = p->next;
+            RandomListNode* pClone = p->next;
+            if(p->random)
+                pClone->random = p->random->next;
+            p = pClone->next;
         }
-
         //split linkedlist
-        pClone = pHead->next;
-        RandomListNode* pCloneHead = pClone;
         p = pHead;
-        while(p && pClone)
+        RandomListNode* pClone = p->next;
+        RandomListNode* pCloneHead = pClone;
+        p->next = pClone->next;
+        p = p->next;
+        while(p)
         {
-            p->next = pClone->next;
-            p = p->next;
             pClone->next = p->next;
             pClone = pClone->next;
+            p->next = pClone->next;
+            p = p->next;
         }
         
         return pCloneHead;
