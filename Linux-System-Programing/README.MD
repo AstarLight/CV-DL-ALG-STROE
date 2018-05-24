@@ -1618,3 +1618,13 @@ AOF缺点：
 ### TCP为什么会粘包?
 TCP为了提高网络的利用率，会使用一个叫做Nagle的算法。该算法是指，发送端即使有要发送的数据，如果很少的话，会延迟发送。如果应用层给TCP传送数据很快的话，就会把两个应用层数据包“粘”在一起，TCP最后只发一个TCP数据包给接收端。
 
+### Redis支持哪些数据结构？
+Redis最为常用的数据类型主要有以下：
+
+- String
+- Hash
+- List
+- Set
+- Sorted set
+- pub/sub
+- Transactions
