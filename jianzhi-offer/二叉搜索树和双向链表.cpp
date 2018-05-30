@@ -1,0 +1,57 @@
+/*
+根据递归版的中序遍历和非递归版的中序遍历，可以给出两个版本的转化方式。
+非递归版：先一步狂奔直到左孩子节点为空，需要一个辅助指针pre，用于记录以一个节点的地址。
+访问当前节点时，需要将当前节点的left设为双向链表的前向指针，并将前一个节点的right设为
+当前节点的地址，这就完成了双向链表中的前后指针的更新。
+*/
+
+/*
+struct TreeNode {
+	int val;
+	struct TreeNode *left;
+	struct TreeNode *right;
+	TreeNode(int x) :
+			val(x), left(NULL), right(NULL) {
+	}
+};*/
+#if 0
+class Solution {
+public:
+    TreeNode* Convert(TreeNode* pRootOfTree)
+    {
+        //非递归中序遍历，访问节点的顺序是从小到大的
+        if(!pRootOfTree)
+            return NULL;
+        
+        stack<TreeNode*> s;
+        TreeNode* p = pRootOfTree;
+        TreeNode* pHead, *pre;
+        bool isHead = true;
+        while(p || !s.empty())
+        {
+            while(p)
+            {
+                s.push(p);
+                p = p->left;
+            }
+            
+            p = s.top();
+            s.pop();
+            if(isHead)
+            {
+                pHead = p;
+                pre = p;
+                isHead = false;
+            }
+            else
+            {
+                p->left = pre;
+                pre->right = p;
+                pre = p;
+            }
+            p = p->right;
+        }
+        return pHead;
+    }
+};
+#endif
