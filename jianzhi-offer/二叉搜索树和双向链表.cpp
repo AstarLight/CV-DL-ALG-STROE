@@ -55,3 +55,42 @@ public:
     }
 };
 #endif
+
+class Solution {
+public:
+    TreeNode* Convert(TreeNode* pRootOfTree)
+    {
+        if(!pRootOfTree)
+            return NULL; 
+        TreeNode* pLastNode = NULL; //指向双向链表的尾节点
+        convertNode(pRootOfTree, &pLastNode);
+        
+        //找链表的头节点
+        TreeNode* pHead = pLastNode;
+        while(pHead != NULL && pHead->left != NULL)
+            pHead = pHead->left;
+        
+        return pHead;
+    }
+private:
+    void convertNode(TreeNode* pNode, TreeNode** pLastNodeInList)
+    {
+        if(!pNode)
+            return;
+        TreeNode* pCurrent = pNode;
+        
+        if(pCurrent->left)
+            convertNode(pCurrent->left, pLastNodeInList);
+        
+        pCurrent->left = *pLastNodeInList;
+       //将已经转换好的链表的最后一个节点的右指针指向当前节点
+        if(*pLastNodeInList)
+            (*pLastNodeInList)->right = pCurrent;
+        //更新已经转换好的链表的最后一个节点
+        *pLastNodeInList = pCurrent;
+
+        //递归处理右子树
+        if(pCurrent->right)
+            convertNode(pCurrent->right, pLastNodeInList);
+    }
+};
