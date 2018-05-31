@@ -2038,4 +2038,43 @@ int main(){
 ### 25匹马求最快的5匹马，有5个赛道
 
 
-### RTTI让你设计，你怎么设计？
+### 什么是RTTI？
+
+C++通过以下的两个操作提供RTTI：
+1. typeid运算符，该运算符返回其表达式或类型名的实际类型。
+2. dynamic_cast运算符，该运算符将基类的指针或引用安全地转换为派生类类型的指针或引用。
+
+dynamic_cast 操作符
+
+如果dynamic_cast转换指针类型失败，则返回0；如果转换引用类型失败，则抛出一个bad_cast类型的异常。
+```
+if (Derived *derivedPtr = dynamic_cast<Derived *>(basePtr))
+{
+    // use the Derived object to which derivedPtr points
+}
+else
+{ // basePtr points at a Base object
+    // use the Base object to which basePtr points
+}
+```
+
+typeid操作符
+
+typeid能够获取一个表达式的类型：typeid(e)。
+
+如果操作数不是类类型或者是没有虚函数的类，则获取其静态类型；如果操作数是定义了虚函数的类类型，则计算运行时类型。
+```
+Base *bp;
+Derived *dp;
+// compare type at run time of two objects
+if (typeid(*bp) == typeid(*dp))
+{
+    // bp and dp point to objects of the same type
+}
+// test whether run time type is a specific type
+if (typeid(*bp) == typeid(Derived))
+{
+    // bp actually points a Derived
+}
+
+```
