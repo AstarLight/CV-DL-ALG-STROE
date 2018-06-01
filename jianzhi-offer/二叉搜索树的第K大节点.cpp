@@ -8,7 +8,7 @@ struct TreeNode {
     }
 };
 */
-
+#if 0
 class Solution {
 public:
     TreeNode* KthNode(TreeNode* pRoot, int k)
@@ -31,4 +31,24 @@ private:
         v.push_back(pRoot);
         inOrder(pRoot->right, v);
     }
+};
+#endif
+
+
+class Solution {
+public:
+    TreeNode* KthNode(TreeNode* pRoot, int k)
+    {
+        if(!pRoot)
+            return NULL;
+        
+        TreeNode* node = KthNode(pRoot->left, k);
+        if(node)
+            return node;
+        if(++index == k)
+            return pRoot;
+        return node = KthNode(pRoot->right, k);
+    }
+private:
+    int index = 0;
 };
