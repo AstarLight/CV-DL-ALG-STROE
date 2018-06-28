@@ -46,3 +46,6 @@ def change_format(in_path,out_path):
                  f2.write('{},{},{},{},{},{},{},{}\n'.format(line[0],line[1],line[6],line[7],line[4],line[5],line[2],line[3]))
              f2.close()
 ```
+### __new__的作用是什么？
+
+### super关键字的作用是什么？
