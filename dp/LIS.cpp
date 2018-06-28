@@ -66,6 +66,7 @@ int LIS2(const vector<int>& s)
         }
         else
         {
+            //　插入排序的思路，找到dp数组中第一个比当前元素大的位置并替换它
             pos = binSearch(s, 0, i-1, s[i]);
             dp[pos] = s[i];
         }
