@@ -102,8 +102,84 @@ calling __new__ from <class '__main__.A'>
 
 ```
 
+### Python如何解决多继承（钻石继承）问题？
+如果我们还是使用普通方法调用父类成员，代码如下：
+```
+class Base(object):
+	def __init__(self):
+		print “Base init”
+class Medium1(Base):
+	def __init__(self):
+		Base.__init__(self)
+		print “Medium1 init”
+class Medium2(Base):
+	def __init__(self):
+		Base.__init__(self)
+		print “Medium2 init”
+class Leaf(Medium1, Medium2):
+	def __init__(self):
+		Medium1.__init__(self)
+		Medium2.__init__(self)
+		print “Leaf init”
+当我们生成Leaf对象时，结果如下：
+
+>>> leaf = Leaf()
+
+Base init
+
+Medium1 init
+
+Base init
+
+Medium2 init
+
+Leaf init
+```
+
+可以看到Base被初始化了两次 ！是由于Medium1和Medium2各自调用了Base的初始化函数导致的。Python解决该问题的策略用就是super。
+```
+class Base(object):
+	def __init__(self):
+		print “Base init”
+class Medium1(Base):
+	def __init__(self):
+		super(Medium1, self).__init__()
+		print “Medium1 init”
+class Medium2(Base):
+	def __init__(self):
+		super(Medium2, self).__init__()
+		print “Medium2 init”
+class Leaf(Medium1, Medium2):
+	def __init__(self):
+		super(Leaf, self).__init__()
+		print “Leaf init”
+我们生成Leaf对象：
+
+>>> leaf = Leaf()
+
+Base init
+
+Medium2 init
+
+Medium1 init
+
+Leaf init
+```
+要理解super的原理，就要先了解mro。mro是method resolution order的缩写，表示了类继承体系中的成员解析顺序。
+
+在python中，每个类都有一个mro的类方法。我们来看一下钻石继承中，Leaf类的mro是什么样子的：
+```
+>>> Leaf.mro()
+
+[<class '__main__.Leaf'>, <class '__main__.Medium1'>, <class '__main__.Medium2'>, <class '__main__.Base'>, <type 'object'>]
+```
+可以看到mro方法返回的是一个祖先类的列表。Leaf的每个祖先都在其中出现一次，这也是super在父类中查找成员的顺序。
+
+通过mro，python巧妙地将多继承的图结构，转变为list的顺序结构。super在继承体系中向上的查找过程，变成了在mro中向右的线性查找过程，任何类都只会被处理一次。
+
 ### super关键字的作用是什么？
 Python中子类调用父类的方法有两种方法能够实现：调用父类构造方法，或者使用super函数（两者不要混用）。
+super是用来解决python钻石多重继承出现的基类重复调用的问题。
 ```
 class A(object):   # Python2.x 记得继承 object
     pass
