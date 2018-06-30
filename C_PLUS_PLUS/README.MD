@@ -2149,3 +2149,93 @@ Derived &Derived::operator=(const Derived &rhs)
 　　return *this;
 }
 ```
+
+### C++多继承时发生的二义性怎么解决？
+当一个派生类,从多个基类派生,而这些基类又有一个共同的基类,则对后面这个原始基类中声明的属性进行访问的时候,会产生二义性.因为这个类会在多继承过程中,多次构造.所以不知道访问的是哪一个属性。解决这种二义性,通过虚拟继承,virtual 关键字.
+
+虚继承的目的是令某个类做出声明，承诺愿意共享它的基类。其中，共享的基类对象称为虚基类。在这种机制下，无论虚基类在继承体系中出现多少次，在派生类中都只包含唯一一个共享的虚基类对象。
+
+```
+#include<iostream>
+using namespace std;
+
+class Parent {
+public:
+    Parent():a(100),b(200),c(300)
+    {
+        cout << "parent 无参构造。。。\n";
+    }
+    Parent(int test) :a(1000), b(2000), c(3000)
+    {
+        cout << "parent 有参构造。。。\n";
+    }
+    ~Parent()
+    {
+        cout << "Parent 析构。。。\n";
+    }
+    int a;
+    int b;
+    int c;
+    void p_print()
+    {
+        cout << "a b c is" << a << " " << b << " " << c << endl;
+    }
+
+};
+class Child1 : virtual public Parent
+{
+public:
+    Child1() :Parent(1), b(0), c(0) { cout << "child 构造\n"; }
+    ~Child1()
+    {
+        cout << "child 析构，，，\n";
+    }
+    void c1_print()
+    {
+        cout << "a b c is" << a << " " << b << " " << c << endl;
+    }
+
+    //int a;
+    int b;
+    int c;
+};
+class Child2 : virtual public Parent
+{
+public:
+    Child2() :Parent(1), b(2), c(3) { cout << "child 构造\n"; }
+    ~Child2()
+    {
+        cout << "child 析构，，，\n";
+    }
+    void c2_print()
+    {
+        cout << "a b c is" << a << " " << b << " " << c << endl;
+    }
+    //int a;
+    int b;
+    int c;
+};
+class Child3 : public Child1,  public Child2
+{
+public:
+    Child3() : Child1(),Child2(), b(20), c(30) { cout << "child 构造\n"; }
+    ~Child3()
+    {
+        cout << "child 析构，，，\n";
+    }
+    void c3_print()
+    {
+        cout << "a b c is" << a << " " << b << " " << c << endl;
+    }
+    //int a;
+    int b;
+    int c;
+};
+int main()
+{
+    Child3 c3;
+    c3.c3_print();
+    c3.p_print();
+    return 0;
+}
+```
