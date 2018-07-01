@@ -50,8 +50,18 @@ int main()
     test_case2.push_back(39);
     test_case2.push_back(27);
 
+    vector<int> test_case3;
+    // [5, 2, 6, 3, 1, 7]
+    test_case3.push_back(5);
+    test_case3.push_back(2);
+    test_case3.push_back(6);
+    test_case3.push_back(3);
+    test_case3.push_back(1);
+    test_case3.push_back(7);
+
     assert(22 == MaxTheftMoney(test_case1));
     assert(86 == MaxTheftMoney(test_case2));
+    assert(18 == MaxTheftMoney(test_case3));
 
     return 0;
 }
