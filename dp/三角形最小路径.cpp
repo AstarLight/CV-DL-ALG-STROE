@@ -6,17 +6,16 @@
 using namespace std;
 
 /*
-    leetcode 三角形：给定一个二维数组，其保存了一个三角形，求从数字三角形顶端到底端的各数字和最小的路径之和，
-    每次可以向下走相邻的两个位置。
+    leetcode 找零钱： 已知不同面额的钞票，求如何利用最少数量的钞票组成某个金额，求可以
+    使用的最少钞票的数量，如果任意数量的已知面额钞票都无法组成该金额，则返回-1
 */
 
 int minPathLen(const vector<vector<int> >& v)
 {
-    vector<int> a(v[0].size(), 0);
-    printf("a size=%d\n", a.size());
-    vector<vector<int> > dp(v.size(), a);
-    printf("dp[0].size = %d\n", dp[0].size());
-    printf("dp.size = %d\n", dp.size());
+    vector<vector<int> > dp(v);
+    for (int i = 0; i < dp.size(); i++)
+        for (int j = 0; j < dp[i].size(); j++)
+            dp[i][j] = 0;
 
     for (int i = 0; i < dp.size(); i++)
     {
@@ -37,8 +36,12 @@ int minPathLen(const vector<vector<int> >& v)
 
 int main()
 {
-    vector<int> array1(5,0);
-    vector<vector<int> > test_case1(5, array1);
+    vector<vector<int> > test_case1;
+    for (int i = 1; i <= 5; i++)
+    {
+        vector<int> array1(i, 0);
+        test_case1.push_back(array1);
+    }
     /*
     1
     1 1
@@ -62,7 +65,7 @@ int main()
     test_case1[4][3] = 4;
     test_case1[4][4] = 5;
 
-    printf("minPathLen = %d\n", minPathLen(test_case1));
+    assert(7 == minPathLen(test_case1));
 
     return 0;
 }
