@@ -106,11 +106,7 @@ int knapsack01_2(const vector<int>& v, const vector<int>& w, int V)
     {
         for (int j = V; j >= 0; j--)
         {
-            if (j < w[i - 1])  //该物品装不进去
-            {
-                dp[j] = dp[j];
-            }
-            else
+            if(j >= w[i-1])
             {
                 dp[j] = max(dp[j], dp[j - w[i - 1]] + v[i - 1]);
             }
@@ -130,11 +126,7 @@ int knapsackCompleted_2(const vector<int>& v, const vector<int>& w, int V)
     {
         for (int j = 1; j <= V; j++)
         {
-            if (j < w[i - 1])  //该物品装不进去
-            {
-                dp[j] = dp[j];
-            }
-            else
+            if(j >= w[i-1])
             {
                 dp[j] = max(dp[j], dp[j - w[i - 1]] + v[i - 1]);
             }
@@ -155,13 +147,9 @@ int knapsackMulti_2(const vector<int>& v, const vector<int>& w, const vector<int
     {
         for (int j = V; j >= 1; j--)
         {
-            if (j < w[i - 1])  //该物品装不进去
+            if(j >= w[i-1])
             {
-                dp[j] = dp[j];
-            }
-            else
-            {
-                  dp[j] = max(dp[j], dp[j - w[i - 1]] + v[i - 1]);
+                dp[j] = max(dp[j], dp[j - w[i - 1]] + v[i - 1]);
             }
             printf("dp[%d] = %d\n", j, dp[j]);
         }
