@@ -29,10 +29,10 @@ bool isDuplicate(const vector<char> &arr, int k, int t)
     while (k < t)
     {
         if (arr[k] == arr[t])
-            return false;
+            return true;
         k++;
     }
-    return true;
+    return false;
 }
 
 void permutation(vector<char> &arr, int k, vector<vector<char> > &result)
@@ -44,7 +44,7 @@ void permutation(vector<char> &arr, int k, vector<vector<char> > &result)
     }
     for (int i = k; i < arr.size(); i++)
     {
-        if (!isDuplicate(arr, k, i))  //排除重复元素生成的排列
+        if (isDuplicate(arr, k, i))  //排除重复元素生成的排列
             continue;
         swap(arr[i], arr[k]);
         permutation(arr, k + 1, result);
