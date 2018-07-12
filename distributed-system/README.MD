@@ -62,7 +62,7 @@ leader election算法要满足两点：
 - safety: 每一个进程要么不知道结果，要么知道正确的结果（不会选错leader）。
 - liveness: 选举算法总会结束，每一个进程都知道了结果。
 
-Ring leader election 环算法:processes组成了一个环，第i个 process p_i 可以和 p_(i+1)modN通信。
+***Ring leader election 环算法***:processes组成了一个环，第i个 process p_i 可以和 p_(i+1)modN通信。
 
 如果进程i发现原来的leader挂了，它就会发起选举，发送一个包含自己ID a_i “Election”的信息。然后当某个进程j收到了这个信息的时候，会将这个a_i与自己的ID a_j比，如果a_i>a_j, 继续转发这条消息，如果a_i<a_j且它之前没有转发过消息,就把a_i取代掉然后把消息发送出去。如果发现收到的标识符和自己的一样，代表自己成为leader，然后把自己当选的信息发送出去。
 
@@ -70,7 +70,7 @@ Ring leader election 环算法:processes组成了一个环，第i个 process p_i
 
 但是环算法实用价值很少，因为在选举过程中如果有进程崩溃，选举就无法完成，不符合liveness的要求。
 
-Bully Algorithm 霸道算法:设系统是同步的，所有进程都可以互相通信。当某一进程发现leader挂掉，如果自己ID最大，就宣布自己是leader，否则向ID比自己高的进程发起选举。发起选举如果没有收到回应，就宣布自己是leader，收到了回应就等待比自己ID大的进程宣布结果。
+***Bully Algorithm 霸道算法***:设系统是同步的，所有进程都可以互相通信。当某一进程发现leader挂掉，如果自己ID最大，就宣布自己是leader，否则向ID比自己高的进程发起选举。发起选举如果没有收到回应，就宣布自己是leader，收到了回应就等待比自己ID大的进程宣布结果。
 当一个进程收到从ID比自己低的进程发来的选举消息时，就向更高的进程发起选举。
 
 最坏时间复杂度分析：只需5个消息传递时间
