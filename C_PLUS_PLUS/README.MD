@@ -2351,3 +2351,79 @@ B::Fun with number 10请按任意键继续. . .
 
 virtual函数是动态绑定的，而缺省参数却是静态绑定。由于a是一个指向B实例的引用，因此在运行的时候会调用B::Fun。但缺省参数是在编译期决定的。在编译的时候，编译器只知道a是一个类型a的引用，具体指向什么类型在编译期是不能确定的，因此会按照A::Fun的声明把缺省参数number设为10。 
  这一题的关键在于理解确定缺省参数的值是在编译的时候，但确定引用、指针的虚函数调用哪个类型的函数是在运行的时候。
+
+### 为什么说要避免遮掩继承而来的名称？
+```
+#include <iostream>
+
+using namespace std;
+
+class Base
+{
+private:
+    int x;
+public:
+    virtual void mf1() = 0;
+    virtual void mf1(int)
+    {
+        cout << "Base: I am int mf1!" << endl;
+    }
+    virtual void mf2()
+    {
+        cout << "Base: I am void mf2!" << endl;
+    }
+    void mf3()
+    {
+        cout << "Base: I am void mf3!" << endl;
+    }
+    void mf3(double)
+    {
+        cout << "Base: I am double mf3!" << endl;
+    }
+};
+
+class Derived :public Base
+{
+public:
+    virtual void mf1()
+    {
+        cout << "Derived: I am void mf1!" << endl;
+    }
+    void mf3()
+    {
+        cout << "Derived: I am void mf3!" << endl;
+    }
+};
+
+int main()
+{
+    Derived d;
+    int x = 0;
+    d.mf1();  //OK
+    d.mf2();  //OK
+    d.mf3();  //OK
+    //d.mf1(x); //ERROR
+    //d.mf3(x);  //ERROR
+
+    return 0;
+}
+```
+
+从上面的代码看出，derived class内的mf1和mf3函数都被遮盖了，这是违背我们的意图的。
+解决方法是使用using 声明。
+```
+class Derived :public Base
+{
+public:
+    using Base::mf1;  //让Base class内名为mf1和mf3的所有东西在Derived作用域内都可见
+    using Base::mf3;
+    virtual void mf1()
+    {
+        cout << "Derived: I am void mf1!" << endl;
+    }
+    void mf3()
+    {
+        cout << "Derived: I am void mf3!" << endl;
+    }
+};
+```
