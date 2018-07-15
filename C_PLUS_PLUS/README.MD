@@ -2427,3 +2427,50 @@ public:
     }
 };
 ```
+### placement new有什么用途？与new的区别在哪里？
+
+我们知道使用new操作符分配内存需要在堆中查找足够大的剩余空间，这个操作速度是很慢的，而且有可能出现无法分配内存的异常（空间不够）。placement new就可以解决这个问题。我们构造对象都是在一个预先准备好了的内存缓冲区中进行，不需要查找内存，内存分配的时间是常数；而且不会出现在程序运行中途出现内存不足的异常。所以，placement new非常适合那些对时间要求比较高，长时间运行不希望被打断的应用程序。
+
+
+使用方法如下：
+1. 缓冲区提前分配，可以使用堆的空间，也可以使用栈的空间，所以分配方式有如下两种：
+```
+class MyClass {…}; 
+char *buf=new char[N*sizeof(MyClass)+ sizeof(int) ] ; 或者char buf[N*sizeof(MyClass)+ sizeof(int) ];
+```
+2. 对象的构造
+```
+MyClass * pClass=new(buf) MyClass;
+```
+3. 对象的销毁,一旦这个对象使用完毕，你必须显式的调用类的析构函数进行销毁对象。但此时内存空间不会被释放，以便其他的对象的构造。
+```
+pClass->~MyClass();
+```
+4. 内存的释放,如果缓冲区在堆中，那么调用delete[] buf;进行内存的释放；如果在栈中，那么在其作用域内有效，跳出作用域，内存自动释放。
+
+
+```
+#include <stdio.h>
+#include <iostream>
+
+using namespace std;
+
+class Base
+{
+};
+
+int main()
+{
+    char *p = new char[sizeof(Base) + sizeof(int)];
+    Base* pB = new(p) Base;
+    printf("pB addr is %p\n", pB);
+    pB->~Base();
+    Base* pC = new(p) Base;
+    printf("pC addr is %p\n", pC);
+    pC->~Base();
+    delete[] p;
+
+    return 0;
+```
+
+输出的地址是一样的！
