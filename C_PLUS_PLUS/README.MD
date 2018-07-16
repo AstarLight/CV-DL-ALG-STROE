@@ -75,6 +75,30 @@ int main() {
 ### 什么是隐式类型转换？怎么避免？
 对于内置类型，低精度的变量给高精度变量赋值会发生隐式类型转换，其次，对于只存在单个参数的构造函数的对象构造来说，函数调用可以直接使用该参数传入，编译器会自动调用其构造函数生成临时对象。避免：explict关键字
 
+对于第二种情况
+```
+void fun(CTest test); 
+
+class CTest 
+{ 
+public: 
+    CTest(int m = 0); 
+} 
+fun(20);//隐式转换
+```
+加explict显示转换
+```
+void fun(CTest test); 
+
+class CTest 
+{ 
+public: 
+    explicit CTest(int m = 0); 
+} 
+fun(20);//error 隐式转换
+fun(static_cast<CTest>(20)); //ok 显式转换
+```
+
 ### 如何定义一个只能在堆上（栈上）生成对象的类?
 1.只能在堆上实例化
 
