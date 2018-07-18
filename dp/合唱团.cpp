@@ -4,8 +4,6 @@
 
 */
 
-
-
 #include <stdio.h>
 #include <vector>
 #include <algorithm>
@@ -14,23 +12,28 @@ using namespace std;
 
 int getMaxValue(const vector<int> &stu, int k, int d)
 {
-    vector<int> dp(k+1, 0);
-    vector <vector<int> > fmax(d+1, dp);
-    vector <vector<int> > fmin(d+1, dp);
-    int res = INT_MIN;;
-    for (int i = 1; i <= stu.size(); i++)
+    vector <vector<int> > fmax(stu.size(), vector<int>(k+1, 0));
+    vector <vector<int> > fmin(stu.size(), vector<int>(k+1, 0));
+
+    for (int i = 0; i < stu.size(); i++)
     {
-        fmax[1][i] = stu[i];
-        fmin[1][i] = stu[i];
-        for (int m = 2; m <= k; m++)
-            for (int j = i - 1; j>0 && i - j <= d; j--)
-            {
-                fmax[m][i] = max(fmax[m][i], max(fmax[m][j - 1] * stu[i], fmin[m][j - 1] * stu[i]));
-                fmin[m][i] = min(fmax[m][i], min(fmax[m][j - 1] * stu[i], fmin[m][j - 1] * stu[i]));
-            }
-        res = max(res, fmax[k][i]);
+        fmax[i][1] = stu[i];
+        fmin[i][1] = stu[i];
     }
-    return res;
+    for (int i = 0; i < stu.size();i++)
+        for (int j = 2; j <= k; j++)
+            for (int m = max(0, i - d); m <= i - 1; m++)
+            {
+                fmax[i][j] = max(fmax[i][j], max(fmax[m][j - 1] * stu[i], fmin[m][j - 1] * stu[i]));
+                fmin[i][j] = min(fmax[i][j], min(fmax[m][j - 1] * stu[i], fmin[m][j - 1] * stu[i]));
+            }
+    
+    int max_val = fmax[k-1][k];
+    for(int i=k;i<stu.size();i++)
+    {
+        max_val = max(max_val, fmax[i][k]);
+    }
+    return max_val;
 }
 
 int main()
