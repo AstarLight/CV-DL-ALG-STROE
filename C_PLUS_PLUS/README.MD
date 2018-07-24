@@ -2502,3 +2502,37 @@ int main()
 ```
 
 输出的地址是一样的！
+
+### 如何动态分配二维数组？
+```
+#include<iostream>
+ 
+using namespace std;
+ 
+int main()
+{
+	//  new动态分配二维数组
+	int row_num, col_num;  //  row_num:行数；col_num：列数
+	cin >> row_num >> col_num;
+	int **arr = new int *[row_num];
+	for (int i = 0; i < row_num; i++)
+	{
+		arr[i] = new int[col_num];
+	}
+       //  输入
+	for (int i = 0; i < row_num; i++)
+	{
+		for (int j = 0; j < col_num; j++)
+		{
+			cin >> arr[i][j];
+		}
+	}
+ 
+	//  delete释放二维数组
+	for (int i = 0; i < row_num; i++)
+		delete[]arr[i];
+	delete[]arr;
+	return 0;
+}
+
+```
