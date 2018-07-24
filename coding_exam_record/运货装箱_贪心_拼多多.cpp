@@ -102,7 +102,7 @@ int main()
         else if(w[right] == 100)
         {
             int len = right -left +1;
-            car_num = car_num + len/3 +(car_num%3  > 0? 1:0);
+            car_num = car_num + len/3 +(len%3  > 0? 1:0);
             break;
         }
         else if(w[left]+w[right]<=300)
