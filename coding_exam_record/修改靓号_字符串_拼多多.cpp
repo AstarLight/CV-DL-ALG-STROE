@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <vector>
 #include <string>
@@ -10,13 +9,13 @@
 1）由1改为6，或由6改为1，花5块钱；2）6位手机号允许000123；3）输出字典序最小的靓号
 *测试用例：N =6,K=5,7 5 5 5 7 7 输出：4 , 55557
 * 分析：
-1.用一个origin_num数组存储原始手机号, 用一个zero_num记录前置０的数量
+1.用一个nzero_num数组存储去掉前置０的原始手机号, 用一个zero_num记录前置０的数量
 2.用一个cost[10]来记录修改对应数字的代价，定义一个vector<int> res来记录变化后的号码
 4.遍历nzero_num数组，当前元素为d,假设要修改的元素就是d，再起一层遍历，计算abs(nzero_num[i]-d),
 这是对于数字d变成靓号的cost。在遍历求cost的期间我们需要建立一个临时的vector　m_cost(nzero_num.size())来记录个元素变成
-d的cost。记录要修改的元素个数t
+d的cost。
 5.对m_cost排序，遍历m_cost求最小的t个值，并将修改后的靓号记录下来于vector<string>,将总cost记录在cost数组内
-6.遍历cost数组，找出cost最小那个改变方式，输出
+6.遍历cost数组，找出cost最小那个改变方式，先输出前置０再输出对应的代价最小数组
 *
 * */
 
@@ -36,15 +35,16 @@ bool cmp(node x, node y)
 
 int main()
 {
-    int front_zero_num = 0;
+    int front_zero_num = 0; //记录前置零的个数
     bool front_zero_flag = true;
     int n, k;
+    string s;
     scanf("%d %d", &n, &k);
+    cin >> s;
     vector<int> nzero_num;
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < s.size(); i++)
     {
-        int tmp;
-        cin >> tmp;
+        int tmp = s[i] - '0';
         if (tmp != 0)
         {
             front_zero_flag = false;
@@ -102,6 +102,7 @@ int main()
     int min_id = 0;
     for (int i = 1; i < cost.size(); i++)
     {
+        //　既要比较改变的代价，又要比较字典序
         if (min_cost > cost[i] || (min_cost == cost[i] && res[min_id] > res[i]))
         {
             min_id = i;
