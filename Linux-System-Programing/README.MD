@@ -1628,11 +1628,11 @@ TCP为了提高网络的利用率，会使用一个叫做Nagle的算法。该算
 ### Redis支持哪些数据结构？
 Redis最为常用的数据类型主要有以下：
 
-- String（一般做一些复杂的计数功能的缓存）
-- Hash（这里value存放的是结构化的对象，比如存用户信息）
-- List（做简单的消息队列的功能）
-- Set（全局去重的功能）
-- Sorted set（排行榜应用，取TOP N操作）
+- String（一般做一些复杂的计数功能的缓存）,底层数据结构是sds，里面包含len-数组所保存的字符串的长度，free-数组未使用的字节。里面还有个柔型数组。
+- Hash（这里value存放的是结构化的对象，比如存用户信息），底层实现是ziplist-键短和hashtable-键长
+- List（做简单的消息队列的功能）,底层实现是ziplist-键短和linkedlist-键长
+- Set（全局去重的功能），底层实现是intset-元素是整数而且元素个数较少和hashtable-元素多
+- Sorted set（排行榜应用，取TOP N操作），底层实现是skiplist(为了维持有序)和hashtable(为了O(1)查找)
 - pub/sub
 - Transactions
 
