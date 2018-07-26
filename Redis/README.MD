@@ -79,3 +79,9 @@ redis使用的是**惰性删除＋定期删除策略**，使得合理使用cpu�
 2. 数据被赋值了好几份，就算有一台机器出现故障，也可以使用其他的机器的数据快速恢复
 
 
+### redis的哨兵(sentinel)策略是怎么样的？新的master又是怎么选举出来？
+哨兵(Sentinel) 是一个分布式系统，你可以在一个架构中运行多个哨兵(sentinel) 进程，这些进程使用流言协议(gossipprotocols)来接收关于Master主服务器是否下线的信息，并使用投票协议(Agreement Protocols)来决定是否执行自动故障迁移,以及选择哪个Slave作为新的Master。每个哨兵(Sentinel)进程会向其它哨兵(Sentinel)、Master、Slave定时发送消息，以确认对方是否”活”着，如果发现对方在指定配置时间(可配置的)内未得到回应，则暂时认为对方已掉线，也就是所谓的”主观认为宕机” ，英文名称：Subjective Down，简称SDOWN。有主观宕机，肯定就有客观宕机。当“哨兵群”中的多数Sentinel进程在对Master主服务器做出 SDOWN 的判断，并且通过 SENTINEL is-master-down-by-addr 命令互相交流之后，得出的Master Server下线判断，这种方式就是“客观宕机”，英文名称是：Objectively Down， 简称 ODOWN。通过一定的vote算法，从剩下的slave从服务器节点中，选一台提升为Master服务器节点，然后自动修改相关配置，并开启故障转移（failover）。
+
+从“主观下线”状态切换到“客观下线”状态并没有使用严格的法定人数算法（strong quorum algorithm），而是使用了流言协议，该协议解释为：如果 Sentinel（哨兵）进程在给定的时间范围内，从其他 Sentinel（哨兵）进程那里接收到了足够数量的主服务器下线报告， 那么 Sentinel（哨兵）进程就会将主服务器的状态从“主观下线”改变为“客观下线”。如果之后其他 Sentinel（哨兵）进程不再报告主服务器已下线，那么“客观下线”状态就会被移除。
+
+只要有一个 Sentinel（哨兵）进程发现某个主服务器进入了“客观下线”状态，这个 Sentinel（哨兵）进程就可能会被其他 Sentinel（哨兵）进程推选出，并对失效的主服务器执行自动故障迁移操作。
