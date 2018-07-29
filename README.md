@@ -2,7 +2,9 @@
 
 为春招秋招做知识储备！
 
-CV算法工程师知识体系
+CV Systems工程师知识体系(ML Systems)
+
+**三分算法，七分系统**
 
 - C/C++
 - Python
@@ -12,6 +14,11 @@ CV算法工程师知识体系
 - Pattern Recognition
 - Machine Learing
 - Linux System Programing
+- Distributed system
+- Redis
+- Virtualization
+- CUDA
+- Parallel Computing
 
 
 
