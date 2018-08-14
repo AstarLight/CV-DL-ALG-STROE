@@ -2649,3 +2649,37 @@ int main()
     return 0;
 }
 ```
+### C++中的traits技术怎么理解？
+有一个Compute方法来做一些计算，具有int型的参数并返回int型的值。
+
+现在需求变了，需要在T为int类型时，Compute方法的参数为int，返回类型也为int，当T为float时，Compute方法的参数为float，返回类型为int，而当T为其他类型，Compute方法的参数为T，返回类型也为T，怎么做呢？还是用traits的方式思考下。
+```
+template <typename T>
+struct TraitsHelper {
+    typedef T ret_type;
+    typedef T par_type;
+};
+
+template <>
+struct TraitsHelper<int> {
+    typedef int ret_type;
+    typedef int par_type;
+};
+
+
+template <>
+struct TraitsHelper<float> {
+    typedef float ret_type;
+    typedef int par_type;
+};
+	
+
+template <typename T>
+class Test {
+public:
+     TraitsHelper<T>::ret_type Compute(TraitsHelper<T>::par_type d);
+private:
+     T mData;
+};	
+```
+	可见，我们把因类型不同而引起的变化隔离在了Test类以外，对用户而言完全不需要去关心这些逻辑，他们甚至不需要知道我们是否使用了traits来解决了这个问题。***当函数，类或者一些封装的通用算法中的某些部分会因为数据类型不同而导致处理或逻辑不同时，traits会是一种很好的解决方案。***
