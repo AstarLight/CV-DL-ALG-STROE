@@ -2560,3 +2560,92 @@ func被一个圆括号包含，左边又有一个*，那么func是一个指针�
 int (*(*func)(int *p))[5];
 
 func是一个函数指针，这类函数具有int*类型的形参，返回值是指向数组的指针，所指向的数组的元素是具有5个int元素的数组。
+
+
+### STL迭代器的类型有哪些？
+在STL中，迭代器主要分为5类。各自是：输入迭代器、输出迭代器、前向迭代器、双向迭代器和随机訪问迭代器。
+
+- 输入迭代器：仅仅读。支持++、==、！=；
+- 输出迭代器：仅仅写，支持++；
+- 前向迭代器：读写，支持++、==、！=。
+- 双向迭代器：读写，支持++、--。C++的全部标准库容器都至少在双向迭代器的层次上。；
+- 随机訪问迭代器：读写，支持++、--、[n]、-n、<、<=、>、>=。
+
+### 什么是模板的偏特化和全特化？
+模版特化：任何针对模版参数进一步进行条件限制设计的特化版本。 <<泛型思维>>
+
+完全特化：针对所有的模版参数进行特化。 <<c++ primer>>
+
+```
+#include <iostream>
+using namespace std;
+
+template<typename T, typename N>
+class Test
+{
+public:
+    Test( T i, N j ) : a(i), b(j)
+    {
+        cout<<"普通模板类"<< a <<' ' << b << endl;
+    }
+private:
+    T a;
+    N b;
+};
+
+template<>
+class Test<int , char>
+{
+public:
+    Test( int i, char j ) : a( i ), b( j )
+    {
+        cout<<"模版类全特化"<< a  << ' ' << b << endl;
+    }
+private:
+    int a;
+    char b;
+};
+
+template <typename N>
+class Test<char, N>
+{
+public:
+    Test( char i, N j ):a( i ), b( j )
+    {
+        cout<<"模版类偏特化"<< a<< ' ' << b << endl;
+    }
+private:
+    char a;
+    N b;
+};
+
+//模板函数  
+    template<typename T1, typename T2>  
+void fun(T1 a , T2 b)  
+{  
+    cout<<"模板函数"<<endl;  
+}  
+
+//模版函数全特化  
+template<>  
+void fun<int ,char >(int a, char b)  
+{  
+    cout<<"模版函数全特化"<<endl;  
+}  
+
+//函数不存在偏特化：下面的代码是错误的  
+// template<typename T2> 
+// void fun<char,T2>(char a, T2 b) 
+// { 
+//     cout<<"模版函数偏特化"<<endl; 
+// } 
+
+
+int main()
+{
+    Test<double , double> t1( 0.1,0.2 );   //普通模版类
+    Test<int , char> t2( 1, 'A' );   //模版类完全特化
+    Test<char, bool> t3( 'A', true );  //模版类偏特化
+    return 0;
+}
+```
