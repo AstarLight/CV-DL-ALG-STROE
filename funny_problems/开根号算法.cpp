@@ -3,7 +3,7 @@
 using namespace std;
 
 /*二分法，缺点是数值可能会溢出*/
-double get_genhao_v1(double n)
+double sqr_v1(double n)
 {
     if (n < 0)
         return -1;
@@ -23,7 +23,7 @@ double get_genhao_v1(double n)
 }
 
 /*牛顿迭代法*/
-double get_genhao_v2(double a)
+double sqr_v2(double a)
 {
     if (a < 0)
         return -1;
@@ -39,8 +39,8 @@ double get_genhao_v2(double a)
 
 int main()
 {
-    cout << get_genhao_v1(998.3) << endl;
-    cout << get_genhao_v2(998.3) << endl;
+    cout << sqr_v1(998.3) << endl;
+    cout << sqr_v2(998.3) << endl;
     system("pause");
 
     return 0;
