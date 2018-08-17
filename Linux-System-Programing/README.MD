@@ -1943,3 +1943,8 @@ RST标示复位、用来异常的关闭连接。
 方式1：通过 fork 创建子进程的方式可以实现，其他情况下不行。
 
 方式二：linux 3.9以上内核支持SO_REUSEPORT选项，即允许多个socket bind/listen在同一个端口上。这样，多个进程就可以各自申请socket监听同一个端口，当数据来时，内核做负载均衡，唤醒监听的其中一个进程处理，用法类似于setsockopt(listener, SOL_SOCKET, SO_REUSEPORT, &option, sizeof(option))
+
+### fork与vfork的区别？
+1. vfork保证子进程先运行，在它调用exec或exit之后父进程才可能被调度运行。如果在调用这两个函数之前子进程依赖于父进程的进一步动作，则会导致死锁。
+
+2. fork要拷贝父进程的进程环境；而vfork则不需要完全拷贝父进程的进程环境，在子进程没有调用exec和exit之前，子进程与父进程共享进程环境，相当于线程的概念，此时父进程阻塞等待。
