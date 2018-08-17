@@ -1942,4 +1942,4 @@ RST标示复位、用来异常的关闭连接。
 ### 多个进程监听同一个端口可以实现吗？
 方式1：通过 fork 创建子进程的方式可以实现，其他情况下不行。
 
-方式二：Unix提供了一个接口setsockopt()可以在bind之前设置套接字选项，其中就包括REUSEADDR这个选项，表明可以多个进程复用bind函数中指定的地址和端口
+方式二：linux 3.9以上内核支持SO_REUSEPORT选项，即允许多个socket bind/listen在同一个端口上。这样，多个进程就可以各自申请socket监听同一个端口，当数据来时，内核做负载均衡，唤醒监听的其中一个进程处理，用法类似于setsockopt(listener, SOL_SOCKET, SO_REUSEPORT, &option, sizeof(option))
