@@ -2689,3 +2689,24 @@ private:
 2. 将原来桶里的数通过指针的转换，插入到新桶中(注意STL这里做的很精细，没有直接将数据从旧桶遍历拷贝数据插入到新桶，而是通过指针转换)
 3. 通过swap函数将新桶和旧桶交换，销毁新桶。
 
+### 将vector清空有哪几种方法？
+- 第一种办法使用 clear ，清空元素，但不回收空间
+- 第二种办法使用 erase循环删除，结果同上
+- 第三种办法 最简单的使用swap,清除元素并回收内存
+```
+vector <int>().swap(vecInt);  //清除容器并最小化它的容量，
+//   vecInt.swap(vector<int>()) ;     另一种写法
+j= vecInt.capacity();       //j=0  
+i = vecInt.size();          //i=0   
+```
+解析
+```
+std::vector<T>().swap(v);的作用相当于：    
+  {   
+	  std::vector<T>   temp(v);//1   
+	  temp.swap(v);//2   
+  }   
+  第一句产生一个和v内容一模一样的vector，只不过temp的容量是恰好满足其大小的   
+  第二句把v和temp交换   
+  然后temp就自动解析掉了
+```
