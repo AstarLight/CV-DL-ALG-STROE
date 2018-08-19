@@ -48,3 +48,14 @@ public:
 	    return res;
     }
 };
+
+// exercise on 2018.08.19
+class Solution {
+public:
+    int TreeDepth(TreeNode* pRoot)
+    {
+        if(pRoot == NULL)
+            return 0;
+        return 1+max(TreeDepth(pRoot->left), TreeDepth(pRoot->right));
+    }
+};
