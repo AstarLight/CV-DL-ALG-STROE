@@ -52,3 +52,33 @@ public:
 private:
     int index = 0;
 };
+
+
+// exercise on 2019.08.19
+
+class Solution {
+public:
+    TreeNode* KthNode(TreeNode* pRoot, int k)
+    {
+        TreeNode* pResult = NULL;
+        KthNode(pRoot, k,&pResult);
+        return pResult;
+    }
+    
+    void KthNode(TreeNode* pRoot, int& k, TreeNode** pResult)
+    {
+        if(pRoot == NULL)
+            return;
+        
+        KthNode(pRoot->left, k, pResult);
+        
+        if(k-- == 1)
+        {
+            *pResult = pRoot;
+            return;
+        }
+        
+        KthNode(pRoot->right, k, pResult);
+    }
+
+};
