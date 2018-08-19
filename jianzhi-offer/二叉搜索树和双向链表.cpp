@@ -94,3 +94,37 @@ private:
             convertNode(pCurrent->right, pLastNodeInList);
     }
 };
+
+
+//exercise on 2018.08.19
+class Solution {
+public:
+    TreeNode* Convert(TreeNode* pRootOfTree)
+    {
+        if(!pRootOfTree)
+            return NULL;
+        TreeNode* pLast = NULL;
+        Convert(pRootOfTree, &pLast);
+        
+        while(pLast && pLast->left)
+        {
+            pLast = pLast->left;
+        }
+        
+        return pLast;
+    }
+    
+   void Convert(TreeNode* pRoot, TreeNode** pLast)
+    {
+        if(pRoot == NULL)
+            return;
+        Convert(pRoot->left, pLast);
+        
+        pRoot->left = *pLast;
+        if(*pLast != NULL)
+            (*pLast)->right = pRoot;
+        *pLast = pRoot;
+        
+        Convert(pRoot->right, pLast);
+    }
+};
