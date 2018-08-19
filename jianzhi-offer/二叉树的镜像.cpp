@@ -48,3 +48,41 @@ public:
         }
     }
 };
+
+// execrise on 2018.08.19
+#if 0
+class Solution {
+public:
+    void Mirror(TreeNode *pRoot) {
+    }
+};
+        if(pRoot == NULL)
+            return;
+        swap(pRoot->left, pRoot->right);
+        Mirror(pRoot->left);
+        Mirror(pRoot->right);
+    }
+};
+#endif
+
+class Solution {
+public:
+    void Mirror(TreeNode *pRoot) {
+        if(pRoot == NULL)
+            return;
+        stack<TreeNode*> s;
+        s.push(pRoot);
+        while(!s.empty())
+        {
+            TreeNode* p = s.top();
+            s.pop();
+            
+            swap(p->left, p->right);
+            
+            if(p->left)
+                s.push(p->left);
+            if(p->right)
+                s.push(p->right);
+        }
+    }
+};
