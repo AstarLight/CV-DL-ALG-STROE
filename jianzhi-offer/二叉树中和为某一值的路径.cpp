@@ -55,3 +55,37 @@ private:
         path.pop_back();
     }
 };
+
+
+// exercise on 2018.08.19
+class Solution {
+public:
+    vector<vector<int> > FindPath(TreeNode* root,int expectNumber) {
+        vector<int> path;
+        int curSum = 0;
+        FindPath(root, expectNumber, curSum, path);
+        return result;
+    }
+    
+    void FindPath(TreeNode* root,int expectNumber,int& curSum, vector<int>& curPath)
+    {
+        if(root == NULL)
+            return;
+        
+        curPath.push_back(root->val);
+        curSum += root->val;
+        if(!root->left && !root->right)
+        {
+            if(curSum == expectNumber)
+                result.push_back(curPath);
+        }
+        
+        FindPath(root->left, expectNumber, curSum, curPath);
+        FindPath(root->right, expectNumber, curSum, curPath);
+        
+        curSum -= root->val;
+        curPath.pop_back();
+    }
+    
+    vector<vector<int> > result;
+};
