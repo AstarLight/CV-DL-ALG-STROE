@@ -1997,3 +1997,48 @@ Thread 10 (Thread 0x7fa92f5fe700 (LWP 22970)):
 以write()函数为例
 
 ![](./20180111150205692.png)
+
+### 查看系统内存使用量的指令是哪个？
+free
+
+```
+              total        used        free      shared  buff/cache   available
+Mem:        3940524     1117312     1516604      331620     1306608     2249932
+
+```
+
+### 怎么监控系统性能？
+- 监控CPU负载: sar -q 1 2
+```
+lijunshi@ThinkPad:~$ sar -q 1 2
+Linux 4.15.0-32-generic (ThinkPad) 	2018年08月22日 	_x86_64_	(4 CPU)
+
+07时27分19秒   runq-sz  plist-sz   ldavg-1   ldavg-5  ldavg-15   blocked
+07时27分20秒         0       530      0.80      0.83      0.57         0
+07时27分21秒         0       530      0.80      0.83      0.57         0
+Average:            0       530      0.80      0.83      0.57         0
+
+```
+- 查询内存：　sar -r 1 2
+```
+lijunshi@ThinkPad:~$ sar -r 1 2
+Linux 4.15.0-32-generic (ThinkPad) 	2018年08月22日 	_x86_64_	(4 CPU)
+
+07时27分49秒 kbmemfree kbmemused  %memused kbbuffers  kbcached  kbcommit   %commit  kbactive   kbinact   kbdirty
+07时27分50秒   1495888   2444636     62.04     94776   1082432   5246676     46.30   1379636    810244       200
+07时27分51秒   1495856   2444668     62.04     94776   1082320   5246676     46.30   1379644    810132       208
+Average:      1495872   2444652     62.04     94776   1082376   5246676     46.30   1379640    810188       204
+
+```
+- 页面交换查询: sar -W 1 2
+```
+lijunshi@ThinkPad:~$ sar -W 1 2
+Linux 4.15.0-32-generic (ThinkPad) 	2018年08月22日 	_x86_64_	(4 CPU)
+
+07时28分10秒  pswpin/s pswpout/s
+07时28分11秒      0.00      0.00
+07时28分12秒      0.00      0.00
+Average:         0.00      0.00
+
+
+```
