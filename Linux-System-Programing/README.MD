@@ -2162,3 +2162,14 @@ from /lib/i386-linux-gnu/libpthread.so.0
 warning: Source file is more recent than executable.
 17	pthread_mutex_lock(&lock2);     ////线程 5 正试图获得锁 lock2
 ```
+
+### 使用条件变量时为什么要加锁？
+```
+while(1) {
+    pthread_mutex_lock();
+    pthread_cond_wait();
+    取元素；
+    pthread_mutex_unlock();
+}
+```
+条件变量都用互斥锁进行保护，条件变量状态的改变都应该先锁住互斥锁，pthread_cond_wait()需要传入一个已经加锁的互斥锁，该函数把调用线程加入等待条件的调用列表中，然后释放互斥锁，在条件满足从而离开pthread_cond_wait()时，mutex将被重新加锁，这两个函数是原子操作。
