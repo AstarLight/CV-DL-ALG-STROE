@@ -2101,3 +2101,64 @@ Average:         0.00      0.00
 - 之所以用户进程会不停轮询就是因为在数据准备完毕后内核不会回调用户进程，只能通过用户进程一次又一次轮询来查询I/O结果。如果内核能够在完成I/O后通过消息告知用户进程来处理已经得到的数据自然是最好的，异步I/O就是这么回事。
 
 - 异步I/O就是当用户进程发起I/O请求后立即返回，直到内核发送一个信号，告知进程I/O已完成，在整个过程中，都没有进程被阻塞。看上去异步I/O和非阻塞I/O的区别在于：判断数据是否准备完毕的任务从用户进程本身被委托给内核来完成。这里所谓的异步只是操作系统提供的一直机制罢了。
+
+### gdb怎么调试多线程？
+- info threads 显示当前可调试的所有线程，每个线程会有一个GDB为其分配的ID，后面操作线程的时候会用到这个ID。 前面有*的是当前调试的线程。
+
+- thread ID 切换当前调试的线程为指定ID的线程。
+
+- break thread_test.c:123 thread all 在所有线程中相应的行上设置断点
+
+- thread apply ID1 ID2 command 让一个或者多个线程执行GDB命令command。 
+
+- thread apply all command 让所有被调试线程执行GDB命令command。
+
+- set scheduler-locking off|on|step 估计是实际使用过多线程调试的人都可以发现，在使用step或者continue命令调试当前被调试线程的时候，其他线程也是同时执行的，怎么只让被调试程序执行呢。通过这个命令就可以实现这个需求。off 不锁定任何线程，也就是所有线程都执行，这是默认值。 on 只有当前被调试程序会执行。 step 在单步的时候，除了next过一个函数的情况(熟悉情况的人可能知道，这其实是一个设置断点然后continue的行为)以外，只有当前线程会执行。
+
+- where 查看线程执行到哪里了
+
+- f 4  查看该栈情况
+
+```
+查找测试程序的进程号
+
+root 5383 1 0 06:31 ? 00:00:43 gedit /root/Project/xa/main17.c
+root 7197 7179 0 10:04 pts/1 00:00:00 ./main
+root 7218 7206 0 10:04 pts/2 00:00:00 grep --color=auto main
+
+使用gdb 的attach功能
+
+gdb attach 7197
+
+查看当前进程的线程信息
+
+(gdb) info thread
+Id Target Id Frame 
+5 Thread 0xb7539b40 (LWP 7198) "main" 0xb7717424 in __kernel_vsyscall ()
+4 Thread 0xb6d38b40 (LWP 7199) "main" 0xb7717424 in __kernel_vsyscall ()
+3 Thread 0xb6537b40 (LWP 7200) "main" 0xb7717424 in __kernel_vsyscall ()
+2 Thread 0xb5d36b40 (LWP 7201) "main" 0xb7717424 in __kernel_vsyscall ()
+* 1 Thread 0xb753a6c0 (LWP 7197) "main" 0xb7717424 in __kernel_vsyscall ()
+
+ 
+
+ 切换到线程 5 的输出
+
+(gdb) thread  5
+[Switching to thread 5 (Thread 0xb7539b40 (LWP 7198))]
+#0 0xb7717424 in __kernel_vsyscall ()
+(gdb) where
+#0 0xb7717424 in __kernel_vsyscall ()
+#1 0xb76f25a2 in __lll_lock_wait () from /lib/i386-linux-gnu/libpthread.so.0
+#2 0xb76edead in _L_lock_686 () from /lib/i386-linux-gnu/libpthread.so.0
+#3 0xb76edcf3 in pthread_mutex_lock ()
+from /lib/i386-linux-gnu/libpthread.so.0
+#4 0x0804864b in func1 () at main17.c:17
+#5 0x080486ef in thread1 (arg=0x0) at main17.c:44
+#6 0xb76ebd4c in start_thread () from /lib/i386-linux-gnu/libpthread.so.0
+#7 0xb762adde in clone () from /lib/i386-linux-gnu/libc.so.6
+(gdb) f  4
+#4 0x0804864b in func1 () at main17.c:17
+warning: Source file is more recent than executable.
+17	pthread_mutex_lock(&lock2);     ////线程 5 正试图获得锁 lock2
+```
