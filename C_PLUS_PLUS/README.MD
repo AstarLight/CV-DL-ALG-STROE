@@ -2738,6 +2738,44 @@ intgetVal ()
 }
 getVal();
 ```
+
+### C++中的完美转发是什么？
+引用折叠原则：
+- A& & 折叠成 A&
+- A& && 折叠成 A&
+- A&& & 折叠成 A&
+- A&& && 折叠成 A&&
+
+特殊模板参数推导原则：
+1. 如果fwd传进的是个A类型的左值，那么T被决议为A&。
+2. 如果fwd传进的是个A类型的右值，那么T被决议为A。
+
+```
+A x; 
+fwd(x); //推导出fwd(A& &&) 折叠后fwd(A&)
+
+
+A foo();
+fwd(foo());//推导出fwd(A&& &&) 折叠后 fwd(A&&)
+```
+std::forward应用于forwarding reference，代码看起来如下：
+```
+template<class T>
+void fwd(T&& t)
+{
+    foo(std::forward<T>(t));
+}
+```
+接下来就尝试forward该如何实现，分析一下，std::forward是条件cast的，T的推导类型取决于传参给t的是左值还是右值。因此，forward需要做的事情就是当且仅当右值传给t时，也就是当T推导为非引用类型时,forward需要将t（左值）转成右值。forward可以如下实现:
+
+```
+template<class T>
+T&& forward(typename remove_reference<T>::type& t)
+{
+    return static_cast<T&&>(t);
+}
+```
+
 ### delete是怎么知道size的?
 这个问题直接导致我们需要在 new [] 一个对象数组时，需要保存数组的维度，C++ 编译器的做法是在分配数组空间时多分配了 4 个字节的大小，专门保存数组的大小，在 delete [] 时就可以取出这个保存的数，就知道了需要调用析构函数多少次了。
 
