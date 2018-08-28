@@ -2739,7 +2739,87 @@ intgetVal ()
 getVal();
 ```
 
+### C++中的move语义是什么意思？
+std::move是为性能而生，通过std::move，可以避免不必要的拷贝操作。std::move是将对象的状态或者所有权从一个对象转移到另一个对象，只是转移，没有内存的搬迁或者内存拷贝。
+
+```
+#include <iostream>
+#include <utility>
+#include <vector>
+#include <string>
+int main()
+{
+    std::string str = "Hello";
+    std::vector<std::string> v;
+    //调用常规的拷贝构造函数，新建字符数组，拷贝数据
+    v.push_back(str);
+    std::cout << "After copy, str is \"" << str << "\"\n"; //After move, str is "Hello"
+    //调用移动构造函数，掏空str，掏空后，最好不要使用str
+    v.push_back(std::move(str));
+    std::cout << "After move, str is \"" << str << "\"\n";   //After move, str is ""
+    std::cout << "The contents of the vector are \"" << v[0]
+        << "\", \"" << v[1] << "\"\n";   //The contents of the vector are "Hello", "Hello"
+}
+```
+move的构造函数写法
+```
+class ArrayWrapper
+{
+public:
+// default constructor produces a moderately sized array
+     ArrayWrapper ()
+         : _p_vals( new int[ 64 ] )
+         , _size( 64 )
+     {}
+  
+     ArrayWrapper (int n)
+         : _p_vals( new int[ n ] )
+         , _size( n )
+     {}
+  
+     // move constructor
+     ArrayWrapper (ArrayWrapper&& other)
+         : _p_vals( other._p_vals  )
+         , _size( other._size )
+     {
+         other._p_vals = NULL;
+     }
+  
+     // copy constructor
+     ArrayWrapper (const ArrayWrapper& other)
+         : _p_vals( new int[ other._size  ] )
+         , _size( other._size )
+     {
+         for ( int i = 0; i < _size; ++i )
+         {
+             _p_vals[ i ] = other._p_vals[ i ];
+         }
+     }
+     ~ArrayWrapper ()
+     {
+         delete [] _p_vals;
+     }
+  
+ private:
+     int *_p_vals;
+     int _size;
+ };
+```
+
+主要注意以下两点：
+1. 参数是非const的右值引用
+2. other._p_vals应置为NULL
+
+以上的第2点是对第1点的解释，即如果我们使用const右值引用，则不能将other._p_vals置为NULL。但为什么要将other._p_vals置为NULL呢？原因在于析构函数，当临时对象离开其作用域，就像所有其他C++对象一样，它们的析构函数都会被调用。当析构函数被调用后， _p_vals将被释放。这里我们只是复制了_p_vals，如果我们不将_p_vals置为NULL，move就不是真正的“移动”，而是复制，一旦我们使用已释放的内存就会引发运行奔溃。move构造函数的意义在于，通过改变原始的临时对象来避免复制操作。
+
+再次重复，重载move构造函数是为了仅当为临时对象时move构造函数才会被调用，只有临时对象才能被修改。这意味着，如果函数的返回值是const对象，将调用copy构造函数，而不是move构造函数.
+
+
 ### C++中的完美转发是什么？
+之所有存在完美转发，其问题实质是：模板参数类型推导在转发过程中无法保证左右值的引用问题。而完美转发就是在不破坏const属性的前提下通过增加左右值引用概念和新增参数推导规则解决这个问题。
+
+在模板内，如果我们需要将一组参数原封不动的传递给另外一个参数，在没有完美转发的情况下，考虑参数会有多种类型的重载，因此在没有完美转发的情况下，重载函数个数将会达到2^n个，多么庞大的人工量。当使用std::forward辅以模板参数推导规则以保持参数属性不变，实现完美转发节省了大量的工作。
+
 引用折叠原则：
 - A& & 折叠成 A&
 - A& && 折叠成 A&
