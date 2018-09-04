@@ -2181,8 +2181,35 @@ while(1) {
 
 3. 进程在linux中呈树状结构，init为根节点，其它进程均有父进程，某进程的父进程就是启动这个进程的进程，这个进程叫做父进程的子进程。
 
-4. fork的作用是复制一个与当前进程一样的进程。新进程的所有数据（变量、环境变量、程序计数器等）数值都和原进程一致，但是是一个全新的进程，并作为原进程的子进程。
+4. fork的作用是复制一个与当前进程一样的进程。新进程的所有数据（指令，变量值，程序调用栈，环境变量，缓冲区等）数值都和原进程一致，但是是一个全新的进程，并作为原进程的子进程。
 
-http://blog.sina.com.cn/s/blog_4915bcf50100pzy2.html
+那下面这个代码的输出是什么呢？
+```
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+int main(void)
+{
+   int i;
+   for(i=0; i<2; i++){
+      fork();
+      //注意：下面的printf有“\n”
+      printf("ppid=%d, pid=%d, i=%d \n", getppid(), getpid(), i);
+   }
+   sleep(10); //让进程停留十秒，这样我们可以用pstree查看一下进程树
+   return 0;
+}
+```
+输出：
+```
+ppid=8858, pid=8518, i=0
+ppid=8858, pid=8518, i=1
+ppid=8518, pid=8519, i=0
+ppid=8518, pid=8519, i=1
+ppid=8518, pid=8520, i=1
+ppid=8519, pid=8521, i=1
+```
 
-https://coolshell.cn/articles/7965.html
+解析：
+
+![](./a1.png)
