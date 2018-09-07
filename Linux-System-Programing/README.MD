@@ -2234,3 +2234,73 @@ TCP使用四种定时器（Timer，也称为“计时器”）：
 
 有两个 file 数据结构，但它们定义文件操作例程地址是不同的，其中一个是向管道中写入数据的例程地址，而另一个是从管道中读出数据的例程地址。这样，用户程序的系统调用仍然是通常的文件操作，而内核却利用这种抽象机制实现了管道这一特殊操作。
 
+### git常用指令有哪些？
+```
+git tag # 在控制台打印出当前仓库的所有标签
+git tag -a v0.1.2 -m “0.1.2版本”  #创建附注标签
+git tag -a v0.1.1 9fbc3d0  # 补打标签
+git tag -d v0.1.2 # 删除标签
+git push origin v0.1.2 # 将v0.1.2标签提交到git服务器
+git push origin –tags # 将本地所有标签一次性提交到git服务器
+git checkout v0.21 #此时会指向打v0.21标签时的代码状态
+git checkout -b feature_x #创建一个叫做“feature_x”的分支，并切换过去
+git checkout master #切换回主分支
+git branch -d feature_x # 把新建的分支删掉
+git push origin <branch> #将分支推送到远端仓库
+git pull #更新你的本地仓库至最新改动
+git rm --cached one.txt  ## 把git add到缓冲区的文件撤回
+git stash
+git stash pop
+```
+
+### docker的常用指令有哪些？
+```
+docker images          Show docker images
+
+docker ps –a             Show all containers 
+
+docker start ContainerName     Start your container
+
+docker stop ContainerName     Stop your container
+
+docker exec -ti containername /bin/bash   Run a command in a running container
+
+docker rm ContainerName      remove your container
+
+docker rmi ImageName           remove images
+
+docker save -o YourImageName.tar ImageName          save image
+
+docker load --input ImageName.tar          load image
+
+docker export ContainerId > your_container_name.tar         export container
+
+docker import  your_container_name.tar  ContainerName
+```
+
+### 怎么求文件中某一列的平均值？
+```
+打印某一行=列
+awk '{if(NR==3) print $NF}' detection_time.txt
+
+打印行数
+awk 'END{print NR}' detection_time.txt
+
+打印某一行
+awk '{if(NR==3) print}' detection_time.txt
+
+先过滤出最后一列
+awk '{print $NF}' detection_time.txt > value.txt
+
+1、求和
+cat data|awk '{sum+=$1} END {print "Sum = ", sum}'
+ 
+2、求平均
+cat data|awk '{sum+=$1} END {print "Average = ", sum/NR}'
+ 
+3、求最大值
+cat data|awk 'BEGIN {max = 0} {if ($1>max) max=$1 fi} END {print "Max=", max}'
+ 
+4、求最小值（min的初始值设置一个超大数即可）
+awk 'BEGIN {min = 1999999} {if ($1<min) min=$1 fi} END {print "Min=", min}'
+```
