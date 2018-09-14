@@ -2304,3 +2304,9 @@ cat data|awk 'BEGIN {max = 0} {if ($1>max) max=$1 fi} END {print "Max=", max}'
 4、求最小值（min的初始值设置一个超大数即可）
 awk 'BEGIN {min = 1999999} {if ($1<min) min=$1 fi} END {print "Min=", min}'
 ```
+### TCP连接中最大连接数是多少？
+针对client而言，最大连接数是65535（2`32-1），默认是1024，查询limit -n
+
+针对server而言，最大连接数是（2`32 * 2`16 = 2`48）
+
+listen的socket创建的socketfd绑定的端口，这个socketfd是告诉TCP/IP协议栈这个socketfd指向绑定的ip+port，以后有发往这个ip+port的数据包都是发给这个socket，accept返回的connfd是用来标识一个连接五元组的，所以，tcp服务器能处理的连接数实际是由五元组来确定的，更准确的说是由客户端的ip+port来决定连接数的，对于ipv4地址2^32，port是2^16，所以理论的连接数最多是2^48。
