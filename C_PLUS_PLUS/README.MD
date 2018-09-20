@@ -2959,12 +2959,20 @@ int main()
     for(int i=0;i<V.size();i++)
         cout << V[i] << " ";
     cout << endl;
-
+    return 0;
 }
 ```
 
 ```
-    int k, v;
+#include <iostream>
+#include <sstream>
+#include <vector>
+
+using namespace std;
+
+int main()
+{
+    int v;
     vector<int> V;
     cin >> v;
     V.push_back(v);
@@ -2973,9 +2981,14 @@ int main()
         cin >> v;
         V.push_back(v);
     }
-    cin >> k;
+
+    for(int i=0;i<V.size();i++)
+        cout << V[i] << " ";
+    cout << endl;
+    return 0;
+
+}
 ```
 
 
-### Linux指令traceroute的作用是什么？
-程序利用增加存活时间（TTL）值来实现其功能。每当数据包经过一个路由器，其存活时间就会减1。当其存活时间是0时，主机便取消数据包，并传送一个ICMP TTL数据包给原数据包的发出者。raceroute的原理是非常非常的有意思，它收到目的主机的IP后，首先给目的主机发送一个TTL=1（还记得TTL是什么吗？）的UDP(后面就 知道UDP是什么了)数据包，而经过的第一个路由器收到这个数据包以后，就自动把TTL减1，而TTL变为0以后，路由器就把这个包给抛弃了，并同时产生 一个主机不可达的ICMP数据报给主机。主机收到这个数据报以后再发一个TTL=2的UDP数据报给目的主机，然后刺激第二个路由器给主机发ICMP数据 报。如此往复直到到达目的主机。这样，traceroute就拿到了所有的路由器ip。从而避开了ip头只能记录有限路由IP的问题。
+
